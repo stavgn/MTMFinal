@@ -48,7 +48,6 @@ void LeftOpperandAssignmentCommand::exec(std::map<std::string, shared_ptr<Graph>
 {
     std::map<std::string, shared_ptr<Graph>>::iterator graph;
     std::map<std::string, shared_ptr<Graph>>::iterator temp_graph;
-    std::cout << context.size();
     graph = context.find(graphName);
     temp_graph = context.find(params.temp_graphName);
     if (graph == context.end())
@@ -81,6 +80,11 @@ void EvalCommand::addCommand(CreateAndAssignEdgeCommand command)
     EdgeCommands.push_back(command);
 }
 
+void EvalCommand::addCommand(OperationCommand command)
+{
+    OperationCommands.push_back(command);
+}
+
 void EvalCommand::addCommand(FindGraphCommand command)
 {
     FindCommands.push_back(command);
@@ -104,6 +108,10 @@ void EvalCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, IConte
     }
 
     for (std::vector<FindGraphCommand>::iterator it = FindCommands.begin(); it != FindCommands.end(); ++it)
+    {
+        (*it).exec(context, params);
+    }
+    for (std::vector<OperationCommand>::iterator it = OperationCommands.begin(); it != OperationCommands.end(); ++it)
     {
         (*it).exec(context, params);
     }
@@ -147,14 +155,27 @@ PrintCommand::PrintCommand(EvalCommand evalCommand) : evalCommand(evalCommand)
 
 void PrintCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, IContextParams &params)
 {
-    evalCommand.exec(context, params);
-    std::string graphNameToPrint = params.temp_graphName != "" ? params.temp_graphName : params.graphNameToPrint;
-    std::map<std::string, shared_ptr<Graph>>::iterator graph = context.find(graphNameToPrint);
-    if (graph == context.end())
+
+    try
     {
-        throw Exception("Couldn't Find Graph To Print.");
+        params.temp_graphName = "temp[toprint]";
+        shared_ptr<Graph> g = shared_ptr<Graph>(new Graph(params.temp_graphName));
+        std::pair<std::string, shared_ptr<Graph>> p = std::make_pair(params.temp_graphName, g);
+        context.insert(p);
+        evalCommand.exec(context, params);
+        g->print();
+        context.erase(params.temp_graphName);
     }
-    graph->second->print();
+    catch (gcalc::Exception *e)
+    {
+        context.erase(params.temp_graphName);
+        throw e;
+    }
+    catch (gcalc::Exception &e)
+    {
+        context.erase(params.temp_graphName);
+        throw e;
+    }
 }
 
 FindGraphCommand::FindGraphCommand(std::string graphName, std::string attribute) : graphName(graphName), attribute(attribute)
@@ -166,16 +187,14 @@ void FindGraphCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, I
     std::map<std::string, shared_ptr<Graph>>::iterator graph = context.find(graphName);
     if (graph == context.end())
     {
-        throw Exception("Couldn't Find Graph To Copy.");
+        throw Exception("Couldn't Find Graph Copy/Print. " + graphName);
     }
     std::map<std::string, shared_ptr<Graph>>::iterator temp_graph = context.find(params.temp_graphName);
 
     if (temp_graph != context.end())
     {
-        temp_graph->second = graph->second;
+        *(temp_graph->second) = *(graph->second);
     }
-
-    params.graphNameToPrint = graphName;
 }
 
 WhoCommand::WhoCommand()
@@ -212,4 +231,38 @@ void DeleteCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, ICon
         throw Exception("Couldn't Find Graph To Delete.");
     }
     context.erase(graphName);
+}
+
+OperationCommand::OperationCommand(std::string g1, std::string g2, std::string op) : g1(g1), g2(g2), op(op)
+{
+}
+
+void OperationCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, IContextParams &params)
+{
+    std::map<std::string, shared_ptr<Graph>>::iterator graph1 = context.find(g1);
+    std::map<std::string, shared_ptr<Graph>>::iterator graph2 = context.find(g2);
+    std::map<std::string, shared_ptr<Graph>>::iterator temp_graph = context.find(params.temp_graphName);
+
+    if (graph1 == context.end() || graph1 == context.end())
+    {
+        throw Exception("Couldn't Find Graphs to Add.");
+    }
+    *(temp_graph->second) = *(graph1->second);
+
+    if (op == "+")
+    {
+        *(temp_graph->second) = *(temp_graph->second) + *(graph2->second);
+    }
+    else if (op == "^")
+    {
+        *(temp_graph->second) = *(temp_graph->second) ^ *(graph2->second);
+    }
+    else if (op == "-")
+    {
+        *(temp_graph->second) = *(temp_graph->second) - *(graph2->second);
+    }
+    else if (op == "*")
+    {
+        *(temp_graph->second) = *(temp_graph->second) * (*(graph2->second));
+    }
 }

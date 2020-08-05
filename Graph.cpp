@@ -39,13 +39,17 @@ Graph Graph::operator=(Graph g)
 
 void Graph::add_vertex(shared_ptr<Vertex> v)
 {
-
     vertices->insert(v);
 }
 
 void Graph::add_edge(shared_ptr<Vertex> v1, shared_ptr<Vertex> v2)
 {
-    edges->insert(std::make_pair(v1, v2));
+    add_edge(std::make_pair(v1, v2));
+}
+
+void Graph::add_edge(std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>> edge)
+{
+    edges->insert(edge);
 }
 
 std::string Graph::get_name() const
@@ -56,8 +60,6 @@ std::string Graph::get_name() const
 shared_ptr<Vertex> Graph::find_vertex(std::string vertexName)
 {
     std::set<shared_ptr<Vertex>>::iterator it;
-    int s = (*vertices).size();
-    std::cout << s;
     for (it = (*vertices).begin(); it != (*vertices).end(); it++)
     {
         if ((*it)->get_name() == vertexName)
@@ -66,6 +68,19 @@ shared_ptr<Vertex> Graph::find_vertex(std::string vertexName)
         }
     }
     return nullptr;
+}
+
+bool Graph::is_edge_exists(std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>> edge)
+{
+    std::set<std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>>>::iterator it;
+    for (it = edges->begin(); it != edges->end(); it++)
+    {
+        if (it->first->get_name() == edge.first->get_name() && it->second->get_name() == edge.second->get_name())
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 void Graph::print()
@@ -82,4 +97,129 @@ void Graph::print()
     {
         std::cout << it2->first->get_name() << " " << it2->second->get_name() << std::endl;
     }
+}
+
+Graph Graph::operator+(Graph g)
+{
+    std::set<shared_ptr<Vertex>>::iterator it;
+    for (it = g.vertices->begin(); it != g.vertices->end(); it++)
+    {
+        shared_ptr<Vertex> v = find_vertex((*it)->get_name());
+        if (v == nullptr)
+        {
+            add_vertex(*it);
+        }
+    }
+    std::set<std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>>>::iterator it2;
+
+    for (it2 = g.edges->begin(); it2 != g.edges->end(); it2++)
+    {
+        if (is_edge_exists(*it2) == false)
+        {
+            add_edge(*it2);
+        }
+    }
+    return *this;
+}
+
+Graph Graph::operator^(Graph g)
+{
+    shared_ptr<std::set<shared_ptr<Vertex>>> verticesIntersection = shared_ptr<std::set<shared_ptr<Vertex>>>(new std::set<shared_ptr<Vertex>>);
+    shared_ptr<std::set<std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>>>> edgesIntersection = shared_ptr<std::set<std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>>>>(new std::set<std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>>>);
+
+    std::set<shared_ptr<Vertex>>::iterator it;
+    for (it = g.vertices->begin(); it != g.vertices->end(); it++)
+    {
+        shared_ptr<Vertex> v = find_vertex((*it)->get_name());
+        if (v != nullptr)
+        {
+            verticesIntersection->insert(*it);
+        }
+    }
+    std::set<std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>>>::iterator it2;
+
+    for (it2 = g.edges->begin(); it2 != g.edges->end(); it2++)
+    {
+        if (is_edge_exists(*it2))
+        {
+            edgesIntersection->insert(*it2);
+        }
+    }
+    vertices = verticesIntersection;
+    edges = edgesIntersection;
+    return *this;
+}
+
+Graph Graph::operator-(Graph g)
+{
+    shared_ptr<std::set<shared_ptr<Vertex>>> verticesSub = shared_ptr<std::set<shared_ptr<Vertex>>>(new std::set<shared_ptr<Vertex>>);
+    shared_ptr<std::set<std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>>>> edgesSub = shared_ptr<std::set<std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>>>>(new std::set<std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>>>);
+
+    std::set<shared_ptr<Vertex>>::iterator it;
+    for (it = vertices->begin(); it != vertices->end(); it++)
+    {
+        shared_ptr<Vertex> v = g.find_vertex((*it)->get_name());
+        if (v == nullptr)
+        {
+            verticesSub->insert(*it);
+        }
+    }
+    vertices = verticesSub;
+    std::set<std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>>>::iterator it2;
+
+    for (it2 = edges->begin(); it2 != edges->end(); it2++)
+    {
+        shared_ptr<Vertex> v1 = it2->first;
+        shared_ptr<Vertex> v2 = it2->second;
+
+        if (find_vertex((v1)->get_name()) != nullptr && find_vertex((v2)->get_name()) != nullptr)
+        {
+            edgesSub->insert(*it2);
+        }
+    }
+    edges = edgesSub;
+    return *this;
+}
+
+Graph Graph::operator*(Graph g)
+{
+    shared_ptr<std::set<shared_ptr<Vertex>>> verticesProduct = shared_ptr<std::set<shared_ptr<Vertex>>>(new std::set<shared_ptr<Vertex>>);
+    shared_ptr<std::set<std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>>>> edgesProdcut = shared_ptr<std::set<std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>>>>(new std::set<std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>>>);
+
+    std::set<shared_ptr<Vertex>>::iterator it;
+    std::set<shared_ptr<Vertex>>::iterator it2;
+    for (it = vertices->begin(); it != vertices->end(); it++)
+    {
+        for (it2 = g.vertices->begin(); it2 != g.vertices->end(); it2++)
+        {
+            std::string vname = "[" + (*it)->get_name() + ";" + (*it2)->get_name() + "]";
+            shared_ptr<Vertex> v = shared_ptr<Vertex>(new Vertex(vname));
+            verticesProduct->insert(v);
+        }
+    }
+    vertices = verticesProduct;
+    std::set<std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>>>::iterator it3;
+    std::set<std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>>>::iterator it4;
+
+    for (it3 = edges->begin(); it3 != edges->end(); it3++)
+    {
+        for (it4 = g.edges->begin(); it4 != g.edges->end(); it4++)
+        {
+            shared_ptr<Vertex> v1 = (*it3).first;
+            shared_ptr<Vertex> v2 = (*it4).first;
+
+            shared_ptr<Vertex> v3 = (*it3).second;
+            shared_ptr<Vertex> v4 = (*it4).second;
+
+            shared_ptr<Vertex> vr = find_vertex("[" + v1->get_name() + ";" + v2->get_name() + "]");
+            shared_ptr<Vertex> vl = find_vertex("[" + v3->get_name() + ";" + v4->get_name() + "]");
+
+            if (vr != nullptr && vl != nullptr)
+            {
+                edgesProdcut->insert(std::make_pair(vr, vl));
+            }
+        }
+    }
+    edges = edgesProdcut;
+    return *this;
 }

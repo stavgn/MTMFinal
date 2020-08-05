@@ -87,6 +87,30 @@ EvalCommand Parser::parseEvalExpression(std::string cmd)
             edges = edges.substr(edges.find(",") + 1);
         }
     }
+    else if (cmd.find("+") != string::npos)
+    {
+        std::string lstatement = cmd.substr(0, cmd.find("+"));
+        std::string rstatement = cmd.substr(cmd.find("+") + 1);
+        eval.addCommand(OperationCommand(parseTerminalName(lstatement), parseTerminalName(rstatement), "+"));
+    }
+    else if (cmd.find("^") != string::npos)
+    {
+        std::string lstatement = cmd.substr(0, cmd.find("^"));
+        std::string rstatement = cmd.substr(cmd.find("^") + 1);
+        eval.addCommand(OperationCommand(parseTerminalName(lstatement), parseTerminalName(rstatement), "^"));
+    }
+    else if (cmd.find("-") != string::npos)
+    {
+        std::string lstatement = cmd.substr(0, cmd.find("-"));
+        std::string rstatement = cmd.substr(cmd.find("-") + 1);
+        eval.addCommand(OperationCommand(parseTerminalName(lstatement), parseTerminalName(rstatement), "-"));
+    }
+    else if (cmd.find("*") != string::npos)
+    {
+        std::string lstatement = cmd.substr(0, cmd.find("*"));
+        std::string rstatement = cmd.substr(cmd.find("*") + 1);
+        eval.addCommand(OperationCommand(parseTerminalName(lstatement), parseTerminalName(rstatement), "*"));
+    }
     else if (parseTerminalName(cmd) != "" && !isConatainingReservedChars(parseTerminalName(cmd)))
     {
         FindGraphCommand find(parseTerminalName(cmd), "");
@@ -161,7 +185,13 @@ void Parser::command(std::string cmd, std::map<std::string, shared_ptr<Graph>> &
     {
         ResetCommand().exec(context, params);
     }
+    else
+    {
+        throw new Exception("Bad Syntax. no function found.");
+    }
 }
 
-//b = {x,y,z|<y,x>,<z,y>}
-//print(g)
+//b = {x,y|<x,y>}
+//w = {a,b|<a,b>}
+//a = {z|}
+//c = b-a

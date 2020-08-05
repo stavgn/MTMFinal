@@ -22,10 +22,16 @@ namespace gcalc
         ~Graph() = default;
         Graph(const Graph &g);
         Graph operator=(Graph g);
+        Graph operator+(Graph g);
+        Graph operator^(Graph g);
+        Graph operator-(Graph g);
+        Graph operator*(Graph g);
         void add_vertex(shared_ptr<Vertex> v);
         void add_edge(shared_ptr<Vertex> v1, shared_ptr<Vertex> v2);
+        void add_edge(std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>> edge);
         shared_ptr<Vertex> find_vertex(std::string vertexName);
         std::string get_name() const;
+        bool is_edge_exists(std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>> edge);
         void print();
     };
 

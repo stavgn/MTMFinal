@@ -67,6 +67,18 @@ namespace gcalc
         void exec(std::map<std::string, shared_ptr<Graph>> &context, IContextParams &params) override;
     };
 
+    class OperationCommand : public Command
+    {
+        std::string g1;
+        std::string g2;
+        std::string op;
+
+    public:
+        OperationCommand(std::string g1, std::string g2, std::string op);
+        ~OperationCommand() = default;
+        void exec(std::map<std::string, shared_ptr<Graph>> &context, IContextParams &params) override;
+    };
+
     class EvalCommand : public Command
     {
     public:
@@ -74,12 +86,15 @@ namespace gcalc
         std::vector<CreateAndAssignEdgeCommand> EdgeCommands;
         std::vector<FindGraphCommand> FindCommands;
         std::vector<EvalCommand> SubEvalCommands;
+        std::vector<OperationCommand> OperationCommands;
 
         EvalCommand();
         ~EvalCommand() = default;
         void addCommand(CreateAndAssignVertexCommand command);
         void addCommand(CreateAndAssignEdgeCommand command);
         void addCommand(FindGraphCommand command);
+        void addCommand(OperationCommand command);
+
         void exec(std::map<std::string, shared_ptr<Graph>> &context, IContextParams &params) override;
     };
 
