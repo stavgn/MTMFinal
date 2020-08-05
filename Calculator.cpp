@@ -4,6 +4,7 @@
 #include "./Command.h"
 #include <string>
 #include <iostream>
+#include <fstream>
 
 using namespace gcalc;
 using namespace std;
@@ -36,15 +37,43 @@ void Calculator::interactive()
         {
             std::cout << "Error: " << e.what() << std::endl;
         }
-        catch (const std::exception *ex)
+    }
+}
+
+void Calculator::batch(std::string input, std::string output)
+{
+    Parser parse = Parser();
+    std::ifstream in(input);
+    std::streambuf *cinbuf = std::cin.rdbuf();
+    std::cin.rdbuf(in.rdbuf());
+
+    std::ofstream out(output);
+    std::streambuf *coutbuf = std::cout.rdbuf();
+    std::cout.rdbuf(out.rdbuf());
+
+    std::string cmd;
+    while (std::getline(std::cin, cmd))
+    {
+        try
         {
-            std::cout << "Error: " << ex->what() << std::endl;
-            //change before submit
+            if (parse.trim(cmd, " ") == "quit")
+            {
+                in.close();
+                out.close();
+                break;
+            }
+            parse.command(cmd, graphs, IContextParams());
+        }
+        catch (gcalc::Exception *e)
+        {
+            std::cout << "Error: " << e->what() << std::endl;
+        }
+        catch (gcalc::Exception &e)
+        {
+            std::cout << "Error: " << e.what() << std::endl;
         }
     }
 
-    // quit program; destroy;
+    std::cin.rdbuf(cinbuf);
+    std::cout.rdbuf(coutbuf);
 }
-
-//G = {X,Y|<X,Y>}
-//PRINT(G)

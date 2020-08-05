@@ -1,17 +1,23 @@
 #include "./Calculator.h"
+#include "./Exception.h"
+#include <iostream>
 
 using namespace gcalc;
 
-int main()
+int main(int argc, char **argv)
 {
-    // Graph G1 = Graph("G1");
-    // Vertex V1 = Vertex("V1");
-    // Vertex V2 = Vertex("V2");
-    // G1.add_vertex(V2);
-    // G1.add_vertex(V1);
-
     Calculator calc = Calculator();
-    calc.interactive();
-
+    if (argc == 1)
+    {
+        calc.interactive();
+    }
+    if (argc == 3)
+    {
+        calc.batch(argv[1], argv[2]);
+    }
+    else
+    {
+        throw Exception("False num of args");
+    }
     return 0;
 }

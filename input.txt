@@ -1,0 +1,5 @@
+b = {x,y|<x,y>}
+w = {a,b|<a,b>}
+a = {z|}
+c = b-a
+print(b)

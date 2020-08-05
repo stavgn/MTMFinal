@@ -196,8 +196,3 @@ void Parser::command(std::string cmd, std::map<std::string, shared_ptr<Graph>> &
         throw new Exception("Bad Syntax. no function found.");
     }
 }
-
-//b = {x,y|<x,y>}
-//w = {a,b|<a,b>}
-//a = {z|}
-//c = b-a
