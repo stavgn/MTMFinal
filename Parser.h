@@ -25,6 +25,8 @@ namespace gcalc
         std::string trim(std::string &str, std::string whitespace);
         EvalCommand parseEvalExpression(std::string cmd);
         PrintCommand parsePrintCommand(std::string cmd);
+        bool isConatainingReservedChars(std::string cmd);
+        DeleteCommand parseDeleteCommand(std::string cmd);
     };
 
 } // namespace gcalc

@@ -26,9 +26,21 @@ void Calculator::interactive()
         }
         catch (gcalc::Exception *e)
         {
-            std::cout << "Error: " << (*e).what() << std::endl;
+            std::cout << "Error: " << e->what() << std::endl;
+        }
+        catch (gcalc::Exception &e)
+        {
+            std::cout << "Error: " << e.what() << std::endl;
+        }
+        catch (const std::exception *ex)
+        {
+            std::cout << "Error: " << ex->what() << std::endl;
+            //change before submit
         }
     }
 
     // quit program; destroy;
 }
+
+//G = {X,Y|<X,Y>}
+//PRINT(G)

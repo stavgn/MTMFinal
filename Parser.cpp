@@ -23,6 +23,19 @@ std::string Parser::trim(std::string &str, std::string whitespace)
     return str.substr(strBegin, strRange);
 }
 
+bool Parser::isConatainingReservedChars(std::string cmd)
+{
+    std::string chars[8] = {"{", "}", "+", "^", "-", "<", ">", "|"};
+    for (int i = 0; i < 8; i++)
+    {
+        if (cmd.find(chars[i]) != string::npos)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 std::string Parser::parseTerminalName(std::string terminal)
 {
 
@@ -40,42 +53,43 @@ EvalCommand Parser::parseEvalExpression(std::string cmd)
     if (cmd.find("{") != string::npos && cmd.find("}") != string::npos && cmd.find("{") < cmd.find("}"))
     {
         std::string graph_literal = cmd.substr(cmd.find("{") + 1, cmd.find("}") - cmd.find("{") - 1);
-        if (trim(graph_literal, " ") != "")
+        if (trim(graph_literal, " ") == "")
         {
-            if (!cmd.find("|") == string::npos)
+            return eval;
+        }
+        if (cmd.find("|") == string::npos)
+        {
+            throw new Exception("Bad Syntax. Missing |");
+        }
+        std::string vertices = cmd.substr(cmd.find("{") + 1, cmd.find("|") - cmd.find("{") - 1);
+        while (true)
+        {
+            CreateAndAssignVertexCommand vertex = CreateAndAssignVertexCommand(parseTerminalName(vertices.substr(0, vertices.find(","))));
+            eval.addCommand(vertex);
+            if (vertices.find(",") == string::npos)
             {
-                throw new Exception("Bad Syntax. Missing |");
+                break;
             }
-            std::string vertices = cmd.substr(cmd.find("{") + 1, cmd.find("|") - cmd.find("{") - 1);
-            while (true)
+            vertices = vertices.substr(vertices.find(",") + 1);
+        }
+        std::string edges = cmd.substr(cmd.find("|") + 1, cmd.find("}") - cmd.find("|") - 1);
+        while (true && edges != "")
+        {
+            std::string firstVertex = parseTerminalName(edges.substr(edges.find("<") + 1, edges.find(",") - edges.find("<") - 1));
+            std::string secondVertex = parseTerminalName(edges.substr(edges.find(",") + 1, edges.find(">") - edges.find(",") - 1));
+            CreateAndAssignEdgeCommand edge = CreateAndAssignEdgeCommand(firstVertex, secondVertex);
+            eval.addCommand(edge);
+            edges.replace(0, edges.find(">") - edges.find("<") + 1, "");
+            if (edges.find(",") == string::npos)
             {
-                CreateAndAssignVertexCommand vertex = CreateAndAssignVertexCommand(parseTerminalName(vertices.substr(0, vertices.find(","))));
-                eval.addCommand(vertex);
-                if (vertices.find(",") == string::npos)
-                {
-                    break;
-                }
-                vertices = vertices.substr(vertices.find(",") + 1);
+                break;
             }
-            std::string edges = cmd.substr(cmd.find("|") + 1, cmd.find("}") - cmd.find("|") - 1);
-            while (true)
-            {
-                std::string firstVertex = parseTerminalName(edges.substr(edges.find("<") + 1, edges.find(",") - edges.find("<") - 1));
-                std::string secondVertex = parseTerminalName(edges.substr(edges.find(",") + 1, edges.find(">") - edges.find(",") - 1));
-                CreateAndAssignEdgeCommand edge = CreateAndAssignEdgeCommand(firstVertex, secondVertex);
-                eval.addCommand(edge);
-                edges.replace(0, edges.find("<") - edges.find(">") - 1, "");
-                if (edges.find(",") == string::npos)
-                {
-                    break;
-                }
-                edges = edges.substr(edges.find(",") + 1);
-            }
+            edges = edges.substr(edges.find(",") + 1);
         }
     }
-    else if (parseTerminalName(cmd) != "")
+    else if (parseTerminalName(cmd) != "" && !isConatainingReservedChars(parseTerminalName(cmd)))
     {
-        FindGraphCommand find(cmd, "print");
+        FindGraphCommand find(parseTerminalName(cmd), "");
         eval.addCommand(find);
     }
     else
@@ -88,19 +102,36 @@ EvalCommand Parser::parseEvalExpression(std::string cmd)
 
 PrintCommand Parser::parsePrintCommand(std::string cmd)
 {
-    if (cmd.find("PRINT()") == string::npos && cmd.find("PRINT(") != string::npos && cmd.find(")") != string::npos && cmd.find("PRINT(") < cmd.find(")"))
+    if (cmd.find("print()") == string::npos && cmd.find("print(") != string::npos && cmd.find(")") != string::npos && cmd.find("print(") < cmd.find(")"))
     {
-        std::string printCommandParam = cmd.substr(cmd.find("PRINT(") + 6, cmd.find(")") - cmd.find("PRINT(") - 6);
+        std::string printCommandParam = cmd.substr(cmd.find("print(") + 6, cmd.find(")") - cmd.find("print(") - 6);
         if (trim(printCommandParam, " ") == "")
         {
-            throw new Exception("Bad Syntax. PRINT function. No valid graph found");
+            throw new Exception("Bad Syntax. print function. No valid graph found");
         }
         EvalCommand evalExpression = parseEvalExpression(printCommandParam);
         return PrintCommand(evalExpression);
     }
     else
     {
-        throw new Exception("Bad Syntax. PRINT function");
+        throw new Exception("Bad Syntax. print function");
+    }
+}
+
+DeleteCommand Parser::parseDeleteCommand(std::string cmd)
+{
+    if (cmd.find("delete()") == string::npos && cmd.find("delete(") != string::npos && cmd.find(")") != string::npos && cmd.find("delete(") < cmd.find(")"))
+    {
+        std::string deleteCommandParam = cmd.substr(cmd.find("delete(") + 7, cmd.find(")") - cmd.find("delete(") - 7);
+        if (trim(deleteCommandParam, " ") == "")
+        {
+            throw new Exception("Bad Syntax. print function. No valid graph found");
+        }
+        return DeleteCommand(deleteCommandParam);
+    }
+    else
+    {
+        throw new Exception("Bad Syntax. print function");
     }
 }
 
@@ -114,10 +145,23 @@ void Parser::command(std::string cmd, std::map<std::string, shared_ptr<Graph>> &
         AssignmentCommand assignment = AssignmentCommand(lo, ro);
         assignment.exec(context, params);
     }
-    else if (cmd.find("PRINT") != string::npos)
+    else if (cmd.find("print") != string::npos && cmd[cmd.find_last_not_of(" ")] == ')')
     {
         parsePrintCommand(cmd).exec(context, params);
     }
+    else if (cmd.find("delete") != string::npos && cmd[cmd.find_last_not_of(" ")] == ')')
+    {
+        parseDeleteCommand(cmd).exec(context, params);
+    }
+    else if (trim(cmd, " ") == "who")
+    {
+        WhoCommand().exec(context, params);
+    }
+    else if (trim(cmd, " ") == "reset")
+    {
+        ResetCommand().exec(context, params);
+    }
 }
 
-//g = {x,y|<x,y>}
+//b = {x,y,z|<y,x>,<z,y>}
+//print(g)

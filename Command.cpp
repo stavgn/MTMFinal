@@ -5,6 +5,7 @@
 #include "./Command.h"
 #include <string>
 #include <iostream>
+#include <stdlib.h>
 
 using namespace gcalc;
 using namespace std;
@@ -14,27 +15,40 @@ AssignmentCommand::AssignmentCommand(LeftOpperandAssignmentCommand c1, EvalComma
 {
 }
 
-void AssignmentCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, IContextParams params)
+void AssignmentCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, IContextParams &params)
 {
-    params.temp_graphName = "temp[" + c1.graphName + "]";
-    params.graphName = c1.graphName;
-    shared_ptr<Graph> g = shared_ptr<Graph>(new Graph(params.temp_graphName));
-    std::pair<std::string, shared_ptr<Graph>> p = std::make_pair(params.temp_graphName, g);
-    context.insert(p);
-    c2.exec(context, params);
-    c1.exec(context, params);
-    context.erase(params.temp_graphName);
+    try
+    {
+        params.temp_graphName = "temp[" + (c1.graphName != "" ? c1.graphName : std::to_string((rand() % 100))) + "]";
+        params.graphName = c1.graphName;
+        shared_ptr<Graph> g = shared_ptr<Graph>(new Graph(params.temp_graphName));
+        std::pair<std::string, shared_ptr<Graph>> p = std::make_pair(params.temp_graphName, g);
+        context.insert(p);
+        c2.exec(context, params);
+        c1.exec(context, params);
+        context.erase(params.temp_graphName);
+    }
+    catch (gcalc::Exception *e)
+    {
+        context.erase(params.temp_graphName);
+        throw e;
+    }
+    catch (gcalc::Exception &e)
+    {
+        context.erase(params.temp_graphName);
+        throw e;
+    }
 }
 
 LeftOpperandAssignmentCommand::LeftOpperandAssignmentCommand(std::string graphName) : graphName(graphName)
 {
 }
 
-void LeftOpperandAssignmentCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, IContextParams params)
+void LeftOpperandAssignmentCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, IContextParams &params)
 {
     std::map<std::string, shared_ptr<Graph>>::iterator graph;
     std::map<std::string, shared_ptr<Graph>>::iterator temp_graph;
-
+    std::cout << context.size();
     graph = context.find(graphName);
     temp_graph = context.find(params.temp_graphName);
     if (graph == context.end())
@@ -58,7 +72,7 @@ Command::Command()
 {
 }
 
-void Command::exec(std::map<std::string, shared_ptr<Graph>> &context, IContextParams params)
+void Command::exec(std::map<std::string, shared_ptr<Graph>> &context, IContextParams &params)
 {
 }
 
@@ -77,7 +91,7 @@ void EvalCommand::addCommand(CreateAndAssignVertexCommand command)
     VertexCommands.push_back(command);
 }
 
-void EvalCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, IContextParams params)
+void EvalCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, IContextParams &params)
 {
     for (std::vector<CreateAndAssignVertexCommand>::iterator it = VertexCommands.begin(); it != VertexCommands.end(); ++it)
     {
@@ -98,7 +112,7 @@ void EvalCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, IConte
 CreateAndAssignVertexCommand::CreateAndAssignVertexCommand(std::string vertexName) : vertexName(vertexName)
 {
 }
-void CreateAndAssignVertexCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, IContextParams params)
+void CreateAndAssignVertexCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, IContextParams &params)
 {
     shared_ptr<Vertex> v = shared_ptr<Vertex>(new Vertex(vertexName));
     Graph graph = *context.find(params.temp_graphName)->second;
@@ -109,7 +123,7 @@ CreateAndAssignEdgeCommand::CreateAndAssignEdgeCommand(std::string v1_name, std:
 {
 }
 
-void CreateAndAssignEdgeCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, IContextParams params)
+void CreateAndAssignEdgeCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, IContextParams &params)
 {
     std::map<std::string, shared_ptr<Graph>>::iterator it = context.find(params.temp_graphName);
     if (it == context.end())
@@ -131,11 +145,11 @@ PrintCommand::PrintCommand(EvalCommand evalCommand) : evalCommand(evalCommand)
 {
 }
 
-void PrintCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, IContextParams params)
+void PrintCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, IContextParams &params)
 {
     evalCommand.exec(context, params);
     std::string graphNameToPrint = params.temp_graphName != "" ? params.temp_graphName : params.graphNameToPrint;
-    std::map<std::string, shared_ptr<Graph>>::iterator graph = context.find("g");
+    std::map<std::string, shared_ptr<Graph>>::iterator graph = context.find(graphNameToPrint);
     if (graph == context.end())
     {
         throw Exception("Couldn't Find Graph To Print.");
@@ -147,10 +161,55 @@ FindGraphCommand::FindGraphCommand(std::string graphName, std::string attribute)
 {
 }
 
-void FindGraphCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, IContextParams params)
+void FindGraphCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, IContextParams &params)
 {
-    if (attribute == "print")
+    std::map<std::string, shared_ptr<Graph>>::iterator graph = context.find(graphName);
+    if (graph == context.end())
     {
-        params.graphNameToPrint = graphName;
+        throw Exception("Couldn't Find Graph To Copy.");
     }
+    std::map<std::string, shared_ptr<Graph>>::iterator temp_graph = context.find(params.temp_graphName);
+
+    if (temp_graph != context.end())
+    {
+        temp_graph->second = graph->second;
+    }
+
+    params.graphNameToPrint = graphName;
+}
+
+WhoCommand::WhoCommand()
+{
+}
+
+void WhoCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, IContextParams &params)
+{
+    std::map<std::string, shared_ptr<Graph>>::iterator it;
+    for (it = context.begin(); it != context.end(); it++)
+    {
+        std::cout << it->first << std::endl;
+    }
+}
+
+ResetCommand::ResetCommand()
+{
+}
+
+void ResetCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, IContextParams &params)
+{
+    context.clear();
+}
+
+DeleteCommand::DeleteCommand(std::string graphName) : graphName(graphName)
+{
+}
+
+void DeleteCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, IContextParams &params)
+{
+    std::map<std::string, shared_ptr<Graph>>::iterator graph = context.find(graphName);
+    if (graph == context.end())
+    {
+        throw Exception("Couldn't Find Graph To Delete.");
+    }
+    context.erase(graphName);
 }

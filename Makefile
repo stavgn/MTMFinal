@@ -1,7 +1,7 @@
 CC=g++
 OBJS= Calculator.o Command.o Exception.o Graph.o main.o Parser.o Vertex.o
 EXEC=gcalc
-DEBUG= -g# now empty, assign -g for debug
+DEBUG=-g# now empty, assign -g for debug
 CFLAGS=-std=c++11 -Wall -Werror
 
 $(EXEC) : $(OBJS)
