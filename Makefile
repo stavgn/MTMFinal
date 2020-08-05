@@ -17,7 +17,7 @@ Exception.o: Exception.cpp Exception.h
 	${CC} -c ${DEBUG} ${CFLAGS} $*.cpp
 main.o: main.cpp Calculator.h Graph.h Vertex.h Exception.h
 	${CC} -c ${DEBUG} ${CFLAGS} $*.cpp
-Vertex.o: Vertex.cpp Vertex.h	
+Vertex.o: Vertex.cpp Vertex.h Exception.h	
 	${CC} -c ${DEBUG} ${CFLAGS} $*.cpp
 Calculator.o: Calculator.cpp Calculator.h Graph.h Vertex.h Parser.h Command.h Graph.h Exception.h Command.h
 	${CC} -c ${DEBUG} ${CFLAGS} $*.cpp

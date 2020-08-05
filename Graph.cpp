@@ -1,5 +1,6 @@
 #include "./Graph.h"
 #include "./Vertex.h"
+#include "./Exception.h"
 #include <iostream>
 
 using namespace gcalc;
@@ -39,16 +40,42 @@ Graph Graph::operator=(Graph g)
 
 void Graph::add_vertex(shared_ptr<Vertex> v)
 {
-    vertices->insert(v);
+    shared_ptr<Vertex> v_check = find_vertex(v->get_name());
+    if (v_check == nullptr)
+    {
+        vertices->insert(v);
+    }
+    else
+    {
+        throw Exception("Cannot Duplicate Vertex " + v->get_name());
+    }
 }
 
 void Graph::add_edge(shared_ptr<Vertex> v1, shared_ptr<Vertex> v2)
 {
+    if (v1->get_name() == v2->get_name())
+    {
+        throw Exception("Cannot create a Self-Edge to" + v2->get_name());
+    }
+    if (find_vertex(v1->get_name()) == nullptr || find_vertex(v2->get_name()) == nullptr)
+    {
+        throw Exception("Cannot create an Edge. One Of The Vertices provided does belong to tis graph");
+    }
     add_edge(std::make_pair(v1, v2));
 }
 
 void Graph::add_edge(std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>> edge)
 {
+    shared_ptr<Vertex> v1 = edge.first;
+    shared_ptr<Vertex> v2 = edge.second;
+    if (v1->get_name() == v2->get_name())
+    {
+        throw Exception("Cannot create a Self-Edge to" + v2->get_name());
+    }
+    if (find_vertex(v1->get_name()) == nullptr || find_vertex(v2->get_name()) == nullptr)
+    {
+        throw Exception("Cannot create an Edge. One Of The Vertices provided does belong to tis graph");
+    }
     edges->insert(edge);
 }
 
