@@ -17,7 +17,7 @@ namespace gcalc
         ~Vertex() = default;
         std::string get_name() const;
         bool operator==(Vertex v) const;
-        bool operator<(Vertex v) const;
+        bool operator<(const Vertex &v) const;
     };
 
 } // namespace gcalc
