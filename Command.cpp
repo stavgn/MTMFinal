@@ -240,13 +240,14 @@ OperationCommand::OperationCommand(std::string g1, std::string g2, std::string o
 void OperationCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, IContextParams &params)
 {
     std::map<std::string, shared_ptr<Graph>>::iterator graph1 = context.find(g1);
-    std::map<std::string, shared_ptr<Graph>>::iterator graph2 = context.find(g2);
+    std::map<std::string, shared_ptr<Graph>>::iterator graph2 = context.find(op != "!" ? g2 : g1);
     std::map<std::string, shared_ptr<Graph>>::iterator temp_graph = context.find(params.temp_graphName);
 
-    if (graph1 == context.end() || graph1 == context.end())
+    if (graph1 == context.end() && graph2 == context.end())
     {
         throw Exception("Couldn't Find Graphs to Add.");
     }
+
     *(temp_graph->second) = *(graph1->second);
 
     if (op == "+")
@@ -264,5 +265,9 @@ void OperationCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, I
     else if (op == "*")
     {
         *(temp_graph->second) = *(temp_graph->second) * (*(graph2->second));
+    }
+    else if (op == "!")
+    {
+        *(temp_graph->second) = !(*(temp_graph->second));
     }
 }

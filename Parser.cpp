@@ -111,6 +111,12 @@ EvalCommand Parser::parseEvalExpression(std::string cmd)
         std::string rstatement = cmd.substr(cmd.find("*") + 1);
         eval.addCommand(OperationCommand(parseTerminalName(lstatement), parseTerminalName(rstatement), "*"));
     }
+    else if (cmd.find("!") != string::npos)
+    {
+        std::string lstatement = cmd.substr(0, cmd.find("!"));
+        std::string rstatement = cmd.substr(cmd.find("!") + 1);
+        eval.addCommand(OperationCommand(parseTerminalName(rstatement), "", "!"));
+    }
     else if (parseTerminalName(cmd) != "" && !isConatainingReservedChars(parseTerminalName(cmd)))
     {
         FindGraphCommand find(parseTerminalName(cmd), "");

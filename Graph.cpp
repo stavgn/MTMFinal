@@ -70,6 +70,11 @@ shared_ptr<Vertex> Graph::find_vertex(std::string vertexName)
     return nullptr;
 }
 
+bool Graph::is_edge_exists(shared_ptr<Vertex> v1, shared_ptr<Vertex> v2)
+{
+    return is_edge_exists(std::make_pair(v1, v2));
+}
+
 bool Graph::is_edge_exists(std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>> edge)
 {
     std::set<std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>>>::iterator it;
@@ -214,12 +219,33 @@ Graph Graph::operator*(Graph g)
             shared_ptr<Vertex> vr = find_vertex("[" + v1->get_name() + ";" + v2->get_name() + "]");
             shared_ptr<Vertex> vl = find_vertex("[" + v3->get_name() + ";" + v4->get_name() + "]");
 
-            if (vr != nullptr && vl != nullptr)
+            if (vr != nullptr && vl != nullptr && *vr != *vl)
             {
                 edgesProdcut->insert(std::make_pair(vr, vl));
             }
         }
     }
     edges = edgesProdcut;
+    return *this;
+}
+
+Graph Graph::operator!()
+{
+    shared_ptr<std::set<std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>>>> edgesComp = shared_ptr<std::set<std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>>>>(new std::set<std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>>>);
+
+    std::set<shared_ptr<Vertex>>::iterator it;
+    std::set<shared_ptr<Vertex>>::iterator it2;
+    for (it = vertices->begin(); it != vertices->end(); it++)
+    {
+        for (it2 = vertices->begin(); it2 != vertices->end(); it2++)
+        {
+
+            if (!is_edge_exists(*it, *it2) && *it != *it2)
+            {
+                edgesComp->insert(std::make_pair(*it, *it2));
+            }
+        }
+    }
+    edges = edgesComp;
     return *this;
 }

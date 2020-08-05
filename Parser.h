@@ -19,10 +19,10 @@ namespace gcalc
         Parser();
         ~Parser() = default;
         void command(std::string cmd, std::map<std::string, shared_ptr<Graph>> &context, IContextParams params);
+        std::string trim(std::string &str, std::string whitespace);
 
     private:
         std::string parseTerminalName(std::string cmd);
-        std::string trim(std::string &str, std::string whitespace);
         EvalCommand parseEvalExpression(std::string cmd);
         PrintCommand parsePrintCommand(std::string cmd);
         bool isConatainingReservedChars(std::string cmd);

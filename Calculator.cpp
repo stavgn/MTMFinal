@@ -16,12 +16,16 @@ void Calculator::interactive()
 {
     Parser parse = Parser();
     std::string cmd;
-    while (cmd != "quit")
+    while (true)
     {
         std::cout << "Gcalc>";
         std::getline(std::cin, cmd);
         try
         {
+            if (parse.trim(cmd, " ") == "quit")
+            {
+                break;
+            }
             parse.command(cmd, graphs, IContextParams());
         }
         catch (gcalc::Exception *e)

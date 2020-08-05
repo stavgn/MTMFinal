@@ -16,6 +16,11 @@ bool Vertex::operator==(Vertex v) const
     return name == v.get_name();
 }
 
+bool Vertex::operator!=(Vertex v) const
+{
+    return name != v.get_name();
+}
+
 bool Vertex::operator<(const Vertex &v) const
 {
     return name < v.get_name();
