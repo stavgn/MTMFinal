@@ -1,6 +1,7 @@
 #include "./Parser.h"
 #include "./Command.h"
 #include "./Exception.h"
+#include "./Helpers.h"
 #include <iostream>
 
 using namespace gcalc;
@@ -130,6 +131,16 @@ EvalCommand Parser::parseEvalExpression(std::string cmd)
         std::string rstatement = cmd.substr(cmd.find("!") + 1);
         eval.addCommand(OperationCommand(parseTerminalName(rstatement), "", "!"));
     }
+    else if (cmd.find("load()") == string::npos && cmd.find("load(") != string::npos && cmd.find(")") != string::npos && cmd.find("load(") < cmd.find(")"))
+    {
+        std::string filename = cmd.substr(cmd.find("load(") + 5, cmd.find(")") - cmd.find("load(") - 5);
+        if (filename.find(',') != string::npos)
+        {
+            throw new Exception("Bad Syntax. no filename with comma allowed");
+        }
+        LoadCommand load(parseTerminalName(filename));
+        eval.addCommand(load);
+    }
     else if (parseTerminalName(cmd) != "" && !isConatainingReservedChars(parseTerminalName(cmd)))
     {
         FindGraphCommand find(parseTerminalName(cmd), "");
@@ -178,6 +189,24 @@ DeleteCommand Parser::parseDeleteCommand(std::string cmd)
     }
 }
 
+SaveCommand Parser::parseSaveCommand(std::string cmd)
+{
+    if (cmd.find("save()") == string::npos && cmd.find("save(") != string::npos && cmd.find(")") != string::npos && cmd.find("save(") < cmd.find(")") && cmd.find(",") != string::npos)
+    {
+        std::string filename = cmd.substr(cmd.find(",") + 1, cmd.find(")") - cmd.find(",") - 1);
+        if (trim(filename, " ") == "" && is_not_reserved_word(filename) && filename.find(',') == string::npos)
+        {
+            throw new Exception("Bad Syntax. save function. No valid filename found");
+        }
+        EvalCommand evalExpression = parseEvalExpression(cmd.substr(cmd.find("save(") + 5, cmd.find(",") - cmd.find("save(") - 5));
+        return SaveCommand(trim(filename, " "), evalExpression);
+    }
+    else
+    {
+        throw new Exception("Bad Syntax. save function");
+    }
+}
+
 void Parser::command(std::string cmd, std::map<std::string, shared_ptr<Graph>> &context, IContextParams params)
 {
     if (cmd.find('=') != string::npos)
@@ -195,6 +224,10 @@ void Parser::command(std::string cmd, std::map<std::string, shared_ptr<Graph>> &
     else if (cmd.find("delete") != string::npos && cmd[cmd.find_last_not_of(" ")] == ')')
     {
         parseDeleteCommand(cmd).exec(context, params);
+    }
+    else if (cmd.find("save") != string::npos && cmd[cmd.find_last_not_of(" ")] == ')')
+    {
+        parseSaveCommand(cmd).exec(context, params);
     }
     else if (trim(cmd, " ") == "who")
     {

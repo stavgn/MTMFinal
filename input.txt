@@ -1,2 +1,5 @@
-b = {[;x][]|}
+b = {a,b| <a,b>}
 a = {[;],[]}
+save(b, test)
+a = load(test)
+print(a)

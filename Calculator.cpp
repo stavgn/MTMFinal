@@ -51,27 +51,36 @@ void Calculator::batch(std::string input, std::string output)
     std::streambuf *coutbuf = std::cout.rdbuf();
     std::cout.rdbuf(out.rdbuf());
 
-    std::string cmd;
-    while (std::getline(std::cin, cmd))
+    if (in.good() && out.good())
     {
-        try
+        std::string cmd;
+        while (std::getline(std::cin, cmd))
         {
-            if (parse.trim(cmd, " ") == "quit")
+            try
             {
-                in.close();
-                out.close();
-                break;
+                if (parse.trim(cmd, " ") == "quit")
+                {
+                    in.close();
+                    out.close();
+                    break;
+                }
+                parse.command(cmd, graphs, IContextParams());
             }
-            parse.command(cmd, graphs, IContextParams());
+            catch (gcalc::Exception *e)
+            {
+                std::cout << "Error: " << e->what() << std::endl;
+            }
+            catch (gcalc::Exception &e)
+            {
+                std::cout << "Error: " << e.what() << std::endl;
+            }
         }
-        catch (gcalc::Exception *e)
-        {
-            std::cout << "Error: " << e->what() << std::endl;
-        }
-        catch (gcalc::Exception &e)
-        {
-            std::cout << "Error: " << e.what() << std::endl;
-        }
+    }
+    else
+    {
+        std::cin.rdbuf(cinbuf);
+        std::cout.rdbuf(coutbuf);
+        throw Exception("Could not read/write to files");
     }
 
     std::cin.rdbuf(cinbuf);

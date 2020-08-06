@@ -19,7 +19,7 @@ Vertex.o: Vertex.cpp Vertex.h Exception.h Helpers.h
 	${CC} -c ${DEBUG} ${CFLAGS} $*.cpp
 Calculator.o: Calculator.cpp Calculator.h Graph.h Vertex.h Parser.h Command.h Graph.h Exception.h Command.h
 	${CC} -c ${DEBUG} ${CFLAGS} $*.cpp
-Parser.o: Parser.cpp Parser.h Command.h Graph.h Vertex.h Command.h Exception.h
+Parser.o: Parser.cpp Parser.h Command.h Graph.h Vertex.h Command.h Exception.h Helpers.o
 	${CC} -c ${DEBUG} ${CFLAGS} $*.cpp
 Helpers.o: Helpers.cpp Helpers.h	
 	${CC} -c ${DEBUG} ${CFLAGS} $*.cpp

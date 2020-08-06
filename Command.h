@@ -79,6 +79,16 @@ namespace gcalc
         void exec(std::map<std::string, shared_ptr<Graph>> &context, IContextParams &params) override;
     };
 
+    class LoadCommand : public Command
+    {
+        std::string filename;
+
+    public:
+        LoadCommand(std::string filename);
+        ~LoadCommand() = default;
+        void exec(std::map<std::string, shared_ptr<Graph>> &context, IContextParams &params) override;
+    };
+
     class EvalCommand : public Command
     {
     public:
@@ -87,13 +97,16 @@ namespace gcalc
         std::vector<FindGraphCommand> FindCommands;
         std::vector<EvalCommand> SubEvalCommands;
         std::vector<OperationCommand> OperationCommands;
+        std::vector<LoadCommand> LoadCommands;
 
         EvalCommand();
         ~EvalCommand() = default;
         void addCommand(CreateAndAssignVertexCommand command);
         void addCommand(CreateAndAssignEdgeCommand command);
         void addCommand(FindGraphCommand command);
+        void addCommand(EvalCommand command);
         void addCommand(OperationCommand command);
+        void addCommand(LoadCommand command);
 
         void exec(std::map<std::string, shared_ptr<Graph>> &context, IContextParams &params) override;
     };
@@ -141,6 +154,17 @@ namespace gcalc
     public:
         DeleteCommand(std::string graphName);
         ~DeleteCommand() = default;
+        void exec(std::map<std::string, shared_ptr<Graph>> &context, IContextParams &params) override;
+    };
+
+    class SaveCommand : public Command
+    {
+        std::string filename;
+        EvalCommand evalCommand;
+
+    public:
+        SaveCommand(std::string filename, EvalCommand evalCommand);
+        ~SaveCommand() = default;
         void exec(std::map<std::string, shared_ptr<Graph>> &context, IContextParams &params) override;
     };
 

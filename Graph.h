@@ -13,11 +13,11 @@ namespace gcalc
 {
     class Graph
     {
+
+    public:
         std::string name;
         shared_ptr<std::set<shared_ptr<Vertex>>> vertices;
         shared_ptr<std::set<std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>>>> edges;
-
-    public:
         Graph(std::string graphName);
         ~Graph() = default;
         Graph(const Graph &g);
