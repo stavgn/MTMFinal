@@ -18,7 +18,7 @@ namespace gcalc
         shared_ptr<std::set<std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>>>> edges;
 
     public:
-        Graph(std::string name);
+        Graph(std::string graphName);
         ~Graph() = default;
         Graph(const Graph &g);
         Graph operator=(Graph g);

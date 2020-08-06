@@ -1,16 +1,24 @@
 #include "./Graph.h"
 #include "./Vertex.h"
 #include "./Exception.h"
+#include "./Helpers.h"
 #include <iostream>
 
 using namespace gcalc;
 using namespace std;
 using std::shared_ptr;
 
-Graph::Graph(std::string name) : name(name)
+Graph::Graph(std::string graphName) : name(graphName)
 {
-    vertices = shared_ptr<std::set<shared_ptr<Vertex>>>(new std::set<shared_ptr<Vertex>>);
-    edges = shared_ptr<std::set<std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>>>>(new std::set<std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>>>);
+    if (is_not_reserved_word(name) && is_alpha(name.substr(0, 1)) && is_alphanumeric(name.substr(1)))
+    {
+        vertices = shared_ptr<std::set<shared_ptr<Vertex>>>(new std::set<shared_ptr<Vertex>>);
+        edges = shared_ptr<std::set<std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>>>>(new std::set<std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>>>);
+    }
+    else
+    {
+        throw Exception("Illegal Graph Name.");
+    }
 }
 
 Graph::Graph(const Graph &g)
@@ -75,6 +83,10 @@ void Graph::add_edge(std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>> edge)
     if (find_vertex(v1->get_name()) == nullptr || find_vertex(v2->get_name()) == nullptr)
     {
         throw Exception("Cannot create an Edge. One Of The Vertices provided does belong to tis graph");
+    }
+    if (is_edge_exists(v1, v2))
+    {
+        throw Exception("Cannot Duplicate Edge");
     }
     edges->insert(edge);
 }

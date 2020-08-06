@@ -19,7 +19,7 @@ void AssignmentCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, 
 {
     try
     {
-        params.temp_graphName = "temp[" + (c1.graphName != "" ? c1.graphName : std::to_string((rand() % 100))) + "]";
+        params.temp_graphName = "temp000" + (c1.graphName != "" ? c1.graphName : std::to_string((rand() % 100)));
         params.graphName = c1.graphName;
         shared_ptr<Graph> g = shared_ptr<Graph>(new Graph(params.temp_graphName));
         std::pair<std::string, shared_ptr<Graph>> p = std::make_pair(params.temp_graphName, g);
@@ -158,7 +158,7 @@ void PrintCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, ICont
 
     try
     {
-        params.temp_graphName = "temp[toprint]";
+        params.temp_graphName = "temp000toprint";
         shared_ptr<Graph> g = shared_ptr<Graph>(new Graph(params.temp_graphName));
         std::pair<std::string, shared_ptr<Graph>> p = std::make_pair(params.temp_graphName, g);
         context.insert(p);

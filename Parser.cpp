@@ -57,11 +57,8 @@ EvalCommand Parser::parseEvalExpression(std::string cmd)
         {
             return eval;
         }
-        if (cmd.find("|") == string::npos)
-        {
-            throw new Exception("Bad Syntax. Missing |");
-        }
-        std::string vertices = cmd.substr(cmd.find("{") + 1, cmd.find("|") - cmd.find("{") - 1);
+
+        std::string vertices = cmd.substr(cmd.find("{") + 1, (cmd.find("|") == string::npos ? cmd.find("}") : cmd.find("|")) - cmd.find("{") - 1);
         while (true)
         {
             CreateAndAssignVertexCommand vertex = CreateAndAssignVertexCommand(parseTerminalName(vertices.substr(0, vertices.find(","))));
@@ -72,17 +69,33 @@ EvalCommand Parser::parseEvalExpression(std::string cmd)
             }
             vertices = vertices.substr(vertices.find(",") + 1);
         }
-        std::string edges = cmd.substr(cmd.find("|") + 1, cmd.find("}") - cmd.find("|") - 1);
-        while (true && edges != "")
+        if (cmd.find("|") == string::npos)
         {
+            return eval;
+        }
+        std::string edges = cmd.substr(cmd.find("|") + 1, cmd.find("}") - cmd.find("|") - 1);
+        while (true && trim(edges, " ") != "")
+        {
+            if (edges.find("<") == string::npos || edges.find(">") == string::npos)
+            {
+                throw Exception("Bad Syntax. Invalid Edge definition.");
+            }
             std::string firstVertex = parseTerminalName(edges.substr(edges.find("<") + 1, edges.find(",") - edges.find("<") - 1));
             std::string secondVertex = parseTerminalName(edges.substr(edges.find(",") + 1, edges.find(">") - edges.find(",") - 1));
             CreateAndAssignEdgeCommand edge = CreateAndAssignEdgeCommand(firstVertex, secondVertex);
             eval.addCommand(edge);
-            edges.replace(0, edges.find(">") - edges.find("<") + 1, "");
+            edges.replace(0, edges.find(">") + 1, "");
+            if (trim(edges, " ") == ",")
+            {
+                throw Exception("Bad Syntax. Invalid Edge definition. Extra comma");
+            }
             if (edges.find(",") == string::npos)
             {
-                break;
+                if (trim(edges, " ") == "")
+                {
+                    break;
+                }
+                throw Exception("Bad Syntax. Invalid Edge definition. missing comma");
             }
             edges = edges.substr(edges.find(",") + 1);
         }

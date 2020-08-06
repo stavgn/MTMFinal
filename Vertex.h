@@ -13,12 +13,15 @@ namespace gcalc
         std::string name;
 
     public:
-        Vertex(std::string);
+        Vertex(std::string vertexName);
         ~Vertex() = default;
         std::string get_name() const;
         bool operator==(Vertex v) const;
         bool operator!=(Vertex v) const;
         bool operator<(const Vertex &v) const;
+
+    private:
+        bool is_name_valid(std::string name);
     };
 
 } // namespace gcalc
