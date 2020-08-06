@@ -1,5 +1,7 @@
 b = {a,b| <a,b>}
 a = {[;],[]}
+c =a+b
+d = c*d
 save(b, test)
 a = load(test)
 print(a)

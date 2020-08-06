@@ -43,7 +43,7 @@ std::string Parser::parseTerminalName(std::string terminal)
     terminal = trim(terminal, " ");
     if (terminal.find(" ") != string::npos || terminal == "")
     {
-        throw new Exception("Bad Syntax. Bad Terminal name. space or empty");
+        throw Exception("Bad Syntax. Bad Terminal name. space or empty");
     }
     return terminal;
 }
@@ -136,7 +136,7 @@ EvalCommand Parser::parseEvalExpression(std::string cmd)
         std::string filename = cmd.substr(cmd.find("load(") + 5, cmd.find(")") - cmd.find("load(") - 5);
         if (filename.find(',') != string::npos)
         {
-            throw new Exception("Bad Syntax. no filename with comma allowed");
+            throw Exception("Bad Syntax. no filename with comma allowed");
         }
         LoadCommand load(parseTerminalName(filename));
         eval.addCommand(load);
@@ -148,7 +148,7 @@ EvalCommand Parser::parseEvalExpression(std::string cmd)
     }
     else
     {
-        throw new Exception("Bad Syntax. no valid left side assignmet found.");
+        throw Exception("Bad Syntax. no valid left side assignmet found.");
     }
 
     return eval;
@@ -161,14 +161,14 @@ PrintCommand Parser::parsePrintCommand(std::string cmd)
         std::string printCommandParam = cmd.substr(cmd.find("print(") + 6, cmd.find(")") - cmd.find("print(") - 6);
         if (trim(printCommandParam, " ") == "")
         {
-            throw new Exception("Bad Syntax. print function. No valid graph found");
+            throw Exception("Bad Syntax. print function. No valid graph found");
         }
         EvalCommand evalExpression = parseEvalExpression(printCommandParam);
         return PrintCommand(evalExpression);
     }
     else
     {
-        throw new Exception("Bad Syntax. print function");
+        throw Exception("Bad Syntax. print function");
     }
 }
 
@@ -179,13 +179,13 @@ DeleteCommand Parser::parseDeleteCommand(std::string cmd)
         std::string deleteCommandParam = cmd.substr(cmd.find("delete(") + 7, cmd.find(")") - cmd.find("delete(") - 7);
         if (trim(deleteCommandParam, " ") == "")
         {
-            throw new Exception("Bad Syntax. print function. No valid graph found");
+            throw Exception("Bad Syntax. print function. No valid graph found");
         }
         return DeleteCommand(deleteCommandParam);
     }
     else
     {
-        throw new Exception("Bad Syntax. print function");
+        throw Exception("Bad Syntax. print function");
     }
 }
 
@@ -196,14 +196,14 @@ SaveCommand Parser::parseSaveCommand(std::string cmd)
         std::string filename = cmd.substr(cmd.find(",") + 1, cmd.find(")") - cmd.find(",") - 1);
         if (trim(filename, " ") == "" && is_not_reserved_word(filename) && filename.find(',') == string::npos)
         {
-            throw new Exception("Bad Syntax. save function. No valid filename found");
+            throw Exception("Bad Syntax. save function. No valid filename found");
         }
         EvalCommand evalExpression = parseEvalExpression(cmd.substr(cmd.find("save(") + 5, cmd.find(",") - cmd.find("save(") - 5));
         return SaveCommand(trim(filename, " "), evalExpression);
     }
     else
     {
-        throw new Exception("Bad Syntax. save function");
+        throw Exception("Bad Syntax. save function");
     }
 }
 
@@ -239,6 +239,6 @@ void Parser::command(std::string cmd, std::map<std::string, shared_ptr<Graph>> &
     }
     else
     {
-        throw new Exception("Bad Syntax. no function found.");
+        throw Exception("Bad Syntax. no function found.");
     }
 }

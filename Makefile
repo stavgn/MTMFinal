@@ -1,4 +1,4 @@
-CC=g++
+CC=/usr/local/bin/g++
 OBJS= Calculator.o Command.o Exception.o Graph.o main.o Parser.o Vertex.o Helpers.o
 EXEC=gcalc
 DEBUG=-g# now empty, assign -g for debug

@@ -155,7 +155,7 @@ void CreateAndAssignEdgeCommand::exec(std::map<std::string, shared_ptr<Graph>> &
     std::map<std::string, shared_ptr<Graph>>::iterator it = context.find(params.temp_graphName);
     if (it == context.end())
     {
-        throw new Exception("couldnt find graph");
+        throw Exception("couldnt find graph");
     }
 
     Graph graph = *it->second;
@@ -261,7 +261,7 @@ void OperationCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, I
     std::map<std::string, shared_ptr<Graph>>::iterator graph2 = context.find(op != "!" ? g2 : g1);
     std::map<std::string, shared_ptr<Graph>>::iterator temp_graph = context.find(params.temp_graphName);
 
-    if (graph1 == context.end() && graph2 == context.end())
+    if (graph1 == context.end() || graph2 == context.end())
     {
         throw Exception("Couldn't Find Graphs to Add.");
     }
@@ -309,24 +309,26 @@ void LoadCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, IConte
             int vertex_size;
             infile.read((char *)&vertex_size, sizeof(int));
             std::string vertex_name;
-            char *temp = new char[vertex_size + 1];
+            char *temp = (char *)malloc((vertex_size + 1) * sizeof(char));
             infile.read(temp, vertex_size);
             temp[vertex_size] = '\0';
             vertex_name = temp;
             shared_ptr<Vertex> v = shared_ptr<Vertex>(new Vertex(vertex_name));
             (temp_graph)->second->add_vertex(v);
+            free(temp);
             num_vertices--;
         }
         while (num_edges > 0)
         {
             int v1_size, v2_size;
             std::string v1_name, v2_name;
-            char *temp1 = new char[v1_size + 1];
-            char *temp2 = new char[v1_size + 1];
 
             infile.read((char *)&v1_size, sizeof(int));
+            char *temp1 = (char *)malloc((v1_size + 1) * sizeof(char));
+
             infile.read(temp1, v1_size);
             infile.read((char *)&v2_size, sizeof(int));
+            char *temp2 = (char *)malloc((v2_size + 1) * sizeof(char));
             infile.read(temp2, v2_size);
 
             temp1[v1_size] = '\0';
@@ -337,6 +339,9 @@ void LoadCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, IConte
             shared_ptr<Vertex> v1 = shared_ptr<Vertex>(new Vertex(v1_name));
             shared_ptr<Vertex> v2 = shared_ptr<Vertex>(new Vertex(v2_name));
             (temp_graph)->second->add_edge(v1, v2);
+
+            free(temp1);
+            free(temp2);
             num_edges--;
         }
     }

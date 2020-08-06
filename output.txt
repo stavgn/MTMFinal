@@ -1,3 +1,4 @@
+Error: Couldn't Find Graphs to Add.
 a
 b
 $
