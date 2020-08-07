@@ -129,17 +129,31 @@ bool Graph::is_edge_exists(std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>> edg
 
 void Graph::print()
 {
+    std::set<std::string> v_ordered;
+    std::set<std::string> e_ordered;
+
     std::set<shared_ptr<Vertex>>::iterator it;
     for (it = vertices->begin(); it != vertices->end(); it++)
     {
-        std::cout << (*it)->get_name() << std::endl;
+        v_ordered.insert((*it)->get_name());
     }
-    std::cout << "$" << std::endl;
     std::set<std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>>>::iterator it2;
 
     for (it2 = edges->begin(); it2 != edges->end(); it2++)
     {
-        std::cout << it2->first->get_name() << " " << it2->second->get_name() << std::endl;
+        e_ordered.insert(it2->first->get_name() + " " + it2->second->get_name());
+    }
+    std::set<std::string>::iterator it3;
+
+    for (it3 = v_ordered.begin(); it3 != v_ordered.end(); it3++)
+    {
+        std::cout << *it3 << std::endl;
+    }
+    std::cout << "$" << std::endl;
+
+    for (it3 = e_ordered.begin(); it3 != e_ordered.end(); it3++)
+    {
+        std::cout << *it3 << std::endl;
     }
 }
 

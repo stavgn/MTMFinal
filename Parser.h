@@ -23,6 +23,7 @@ namespace gcalc
 
     private:
         std::string parseTerminalName(std::string cmd);
+        std::string parseFileName(std::string filename);
         EvalCommand parseEvalExpression(std::string cmd);
         EvalCommand parseEvalExpression2(std::string cmd);
         PrintCommand parsePrintCommand(std::string cmd);
@@ -33,7 +34,7 @@ namespace gcalc
         LoadCommand handleLoadCommand(std::string cmd);
         OperationCommand handleComplementCommand(std::string cmd);
         EvalCommand handleGraphLiteralCommand(std::string cmd);
-        int find_next_op_index(std::string cmd, bool &isFound);
+        int find_next_op_index(std::string current, std::string cmd, bool &isFound);
     };
 
 } // namespace gcalc

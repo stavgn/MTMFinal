@@ -17,8 +17,6 @@ namespace gcalc
         ~Calculator() = default;
         void interactive();
         void batch(std::string input, std::string output);
-
-        //void batch(std::string src, std::string out);
     };
 
 } // namespace gcalc

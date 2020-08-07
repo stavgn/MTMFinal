@@ -273,34 +273,48 @@ void OperationCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, I
     std::pair<std::string, shared_ptr<Graph>> pair2 = std::make_pair(p2.temp_graphName, g2_temp);
     context.insert(pair2);
 
-    exp1->exec(context, p1);
-    exp2->exec(context, p2);
+    try
+    {
+        exp1->exec(context, p1);
+        exp2->exec(context, p2);
 
-    std::map<std::string, shared_ptr<Graph>>::iterator temp_graph = context.find(params.temp_graphName);
+        std::map<std::string, shared_ptr<Graph>>::iterator temp_graph = context.find(params.temp_graphName);
 
-    *(temp_graph->second) = *(g1_temp);
+        *(temp_graph->second) = *(g1_temp);
 
-    if (op == "+")
-    {
-        *(temp_graph->second) = *(temp_graph->second) + *(g2_temp);
+        if (op == "+")
+        {
+            *(temp_graph->second) = *(temp_graph->second) + *(g2_temp);
+        }
+        else if (op == "^")
+        {
+            *(temp_graph->second) = *(temp_graph->second) ^ *(g2_temp);
+        }
+        else if (op == "-")
+        {
+            *(temp_graph->second) = *(temp_graph->second) - *(g2_temp);
+        }
+        else if (op == "*")
+        {
+            *(temp_graph->second) = *(temp_graph->second) * (*g2_temp);
+        }
+        else if (op == "!")
+        {
+            *(temp_graph->second) = !(*(temp_graph->second));
+        }
     }
-    else if (op == "^")
+    catch (gcalc::Exception *e)
     {
-        *(temp_graph->second) = *(temp_graph->second) ^ *(g2_temp);
+        context.erase(p1.temp_graphName);
+        context.erase(p2.temp_graphName);
+        throw e;
     }
-    else if (op == "-")
+    catch (gcalc::Exception &e)
     {
-        *(temp_graph->second) = *(temp_graph->second) - *(g2_temp);
+        context.erase(p1.temp_graphName);
+        context.erase(p2.temp_graphName);
+        throw e;
     }
-    else if (op == "*")
-    {
-        *(temp_graph->second) = *(temp_graph->second) * (*g2_temp);
-    }
-    else if (op == "!")
-    {
-        *(temp_graph->second) = !(*(temp_graph->second));
-    }
-
     context.erase(p1.temp_graphName);
     context.erase(p2.temp_graphName);
 }
@@ -316,13 +330,13 @@ void LoadCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, IConte
     {
         std::map<std::string, shared_ptr<Graph>>::iterator temp_graph = context.find(params.temp_graphName);
         int num_vertices, num_edges;
-        infile.read((char *)&num_vertices, sizeof(int));
+        infile.read((char *)&num_vertices, sizeof(unsigned int));
         infile.read((char *)&num_edges, sizeof(int));
 
         while (num_vertices > 0)
         {
             int vertex_size;
-            infile.read((char *)&vertex_size, sizeof(int));
+            infile.read((char *)&vertex_size, sizeof(unsigned int));
             std::string vertex_name;
             char *temp = (char *)malloc((vertex_size + 1) * sizeof(char));
             infile.read(temp, vertex_size);
@@ -338,11 +352,11 @@ void LoadCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, IConte
             int v1_size, v2_size;
             std::string v1_name, v2_name;
 
-            infile.read((char *)&v1_size, sizeof(int));
+            infile.read((char *)&v1_size, sizeof(unsigned int));
             char *temp1 = (char *)malloc((v1_size + 1) * sizeof(char));
 
             infile.read(temp1, v1_size);
-            infile.read((char *)&v2_size, sizeof(int));
+            infile.read((char *)&v2_size, sizeof(unsigned int));
             char *temp2 = (char *)malloc((v2_size + 1) * sizeof(char));
             infile.read(temp2, v2_size);
 
@@ -385,14 +399,14 @@ void SaveCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, IConte
             int num_vertices = g->vertices->size();
             int num_edges = g->edges->size();
 
-            outfile.write((const char *)&num_vertices, sizeof(int));
-            outfile.write((const char *)&num_edges, sizeof(int));
+            outfile.write((const char *)&num_vertices, sizeof(unsigned int));
+            outfile.write((const char *)&num_edges, sizeof(unsigned int));
 
             std::set<shared_ptr<Vertex>>::iterator it;
             for (it = g->vertices->begin(); it != g->vertices->end(); it++)
             {
                 int size = (*it)->get_name().size();
-                outfile.write((const char *)&size, sizeof(int));
+                outfile.write((const char *)&size, sizeof(unsigned int));
                 outfile.write((*it)->get_name().c_str(), size);
             }
 
@@ -405,10 +419,10 @@ void SaveCommand::exec(std::map<std::string, shared_ptr<Graph>> &context, IConte
                 shared_ptr<Vertex> v2 = (*it2).second;
                 int v2_size = v2->get_name().size();
 
-                outfile.write((const char *)&v1_size, sizeof(int));
+                outfile.write((const char *)&v1_size, sizeof(unsigned int));
                 outfile.write(v1->get_name().c_str(), v1_size);
 
-                outfile.write((const char *)&v2_size, sizeof(int));
+                outfile.write((const char *)&v2_size, sizeof(unsigned int));
                 outfile.write(v2->get_name().c_str(), v2_size);
             }
         }

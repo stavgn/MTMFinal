@@ -1,2 +1,2 @@
-Error: Vertex name is not valid: ;[]
-Error: Couldn't Find Graph Copy/Print. c
+g
+$

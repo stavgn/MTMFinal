@@ -14,6 +14,8 @@ namespace gcalc
     std::string strip_to_parantheiss_only(std::string expr, char open, char close);
     bool areParanthesisBalanced(std::string expr);
     std::string char_to_string(char c);
+    int findClosingParen(std::string text, int openPos);
+
 } // namespace gcalc
 
 #endif

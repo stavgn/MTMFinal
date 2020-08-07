@@ -40,7 +40,6 @@ bool Parser::is_valid_cmd_opener(std::string cmd, bool with_literal)
 
 std::string Parser::parseTerminalName(std::string terminal)
 {
-
     terminal = trim(terminal, " ");
     if (terminal.find(" ") != string::npos || terminal == "")
     {
@@ -49,10 +48,19 @@ std::string Parser::parseTerminalName(std::string terminal)
     return terminal;
 }
 
-int Parser::find_next_op_index(std::string cmd, bool &isFound)
+int Parser::find_next_op_index(std::string current, std::string cmd, bool &isFound)
 {
     char chars[4] = {'+', '^', '-', '*'};
-    for (unsigned int i = 0; i < cmd.size(); i++)
+    unsigned int i;
+    if (current == "!" && cmd[1] == '(')
+    {
+        i = 1 + findClosingParen(cmd, 1);
+    }
+    else
+    {
+        i = 0;
+    }
+    for (; i < cmd.size(); i++)
     {
         for (int j = 0; j < 4; j++)
         {
@@ -67,14 +75,27 @@ int Parser::find_next_op_index(std::string cmd, bool &isFound)
     return 0;
 }
 
+std::string Parser::parseFileName(std::string filename)
+{
+    filename = trim(filename, " ");
+    if (filename == "")
+    {
+        throw Exception("Bad Syntax. Bad Terminal name. space or empty");
+    }
+    return filename;
+}
+
 OperationCommand Parser::handleComplementCommand(std::string cmd)
 {
+    EvalCommand find;
     if (cmd[1] == '(')
     {
-        // eval.addCommand(parseEvalExpression(cmd.substr(1)));
-        // return eval;
+        find = parseEvalExpression(cmd.substr(1));
     }
-    EvalCommand find = builFindCommand(cmd.substr(1));
+    else
+    {
+        find = builFindCommand(cmd.substr(1));
+    }
     return OperationCommand(find, find, "!");
 }
 
@@ -122,7 +143,7 @@ LoadCommand Parser::handleLoadCommand(std::string cmd)
     {
         throw Exception("Bad Syntax. no filename with comma allowed");
     }
-    return LoadCommand(parseTerminalName(filename));
+    return LoadCommand(parseFileName(filename));
 }
 
 EvalCommand Parser::handleGraphLiteralCommand(std::string cmd)
@@ -135,6 +156,11 @@ EvalCommand Parser::handleGraphLiteralCommand(std::string cmd)
         if (trim(graph_literal, " ") == "")
         {
             return eval;
+        }
+        std::string remainder = cmd.substr(cmd.find("}") + 1);
+        if (trim(remainder, " ") != "")
+        {
+            throw Exception("Bad Syntax. Invalid Graph Literal definition.");
         }
 
         std::string vertices = cmd.substr(cmd.find("{") + 1, (cmd.find("|") == string::npos ? cmd.find("}") : cmd.find("|")) - cmd.find("{") - 1);
@@ -194,7 +220,6 @@ EvalCommand Parser::parseEvalExpression(std::string cmd)
     EvalCommand prependEval = EvalCommand();
     std::string selectedOp = "";
     cmd = trim(cmd, " ");
-    int parenthesesCounter = 0;
 
     for (unsigned int i = 0; i < cmd.size(); i++)
     {
@@ -211,16 +236,27 @@ EvalCommand Parser::parseEvalExpression(std::string cmd)
 
             if (s == "(")
             {
-                int closeIndex = 9; //find close...
-                OperationCommand op = OperationCommand(prependEval, parseEvalExpression(cmd.substr(i + 1, closeIndex - i - 1)), selectedOp);
-                prependEval.addCommand(op);
-                i = closeIndex + 1;
+                int matchingClosingBracket = findClosingParen(cmd, i);
+                bool isFound;
+                int nextOpIndex = find_next_op_index(s, cmd.substr(matchingClosingBracket), isFound) + matchingClosingBracket;
+                rstatement = parseEvalExpression(cmd.substr(i + 1, matchingClosingBracket - i - 1));
+
+                if (!isFound)
+                {
+                    eval.addCommand(OperationCommand(prependEval, rstatement, selectedOp));
+                    break;
+                }
+
+                nextPrependEval.addCommand(OperationCommand(prependEval, rstatement, selectedOp));
+                prependEval = nextPrependEval;
+                selectedOp = cmd.substr(nextOpIndex, 1);
+                i = nextOpIndex;
                 continue;
             }
             else
             {
                 bool isFound;
-                int nextOpIndex = find_next_op_index(cmd.substr(i), isFound) + i;
+                int nextOpIndex = find_next_op_index(s, cmd.substr(i), isFound) + i;
                 if (!isFound)
                 {
                     rstatement = builFindCommand(cmd.substr(i));
@@ -231,7 +267,7 @@ EvalCommand Parser::parseEvalExpression(std::string cmd)
                 }
             }
             bool isFound;
-            int nextOpIndex = find_next_op_index(cmd.substr(i), isFound) + i;
+            int nextOpIndex = find_next_op_index(s, cmd.substr(i), isFound) + i;
             if (!isFound) //case: this is the last op in cmd
             {
                 eval.addCommand(OperationCommand(prependEval, rstatement, selectedOp));
@@ -245,16 +281,55 @@ EvalCommand Parser::parseEvalExpression(std::string cmd)
         }
         if (s == "(")
         {
-            parenthesesCounter++;
-            continue;
-        }
-        if (s == ")")
-        {
-            parenthesesCounter--;
+            int matchingClosingBracket = findClosingParen(cmd, i);
+            std::string ParenExpression = cmd.substr(i + 1, matchingClosingBracket - i - 1);
+            bool isFound;
+            int nextOpIndex = find_next_op_index(s, cmd.substr(matchingClosingBracket), isFound) + i + matchingClosingBracket;
+            if (!isFound)
+            {
+                eval.addCommand(parseEvalExpression(ParenExpression));
+                break;
+            }
+            std::string op = cmd.substr(nextOpIndex, 1);
+            std::string remainder = cmd.substr(nextOpIndex + 1);
+            int remainderFirstCharIndex = remainder.find_first_not_of(" ") + nextOpIndex + 1;
+            bool isFoundNext;
+            int nextNextOpIndex;
+            if (cmd[remainderFirstCharIndex] == '(')
+            {
+                int remainderMatchingParenIndex = findClosingParen(cmd, remainderFirstCharIndex);
+                std::string remainderAfterSecondParen = cmd.substr(remainderMatchingParenIndex + 1);
+                nextNextOpIndex = find_next_op_index(s, remainderAfterSecondParen, isFoundNext) + i + remainderMatchingParenIndex;
+            }
+            else
+            {
+                nextNextOpIndex = find_next_op_index(s, remainder, isFoundNext) + i + nextOpIndex + 1;
+            }
+            if (!isFoundNext)
+            {
+                EvalCommand lstatement = parseEvalExpression(ParenExpression);
+                EvalCommand rstatement = parseEvalExpression(cmd.substr(nextOpIndex + 1));
+                eval.addCommand(OperationCommand(lstatement, rstatement, op));
+                break;
+            }
+            if (cmd[remainderFirstCharIndex] == '(')
+            {
+                EvalCommand lstatement = parseEvalExpression(ParenExpression);
+                EvalCommand rstatement = parseEvalExpression(cmd.substr(nextOpIndex + 1, nextNextOpIndex - nextOpIndex - 1));
+                prependEval.addCommand(OperationCommand(lstatement, rstatement, op));
+            }
+            else
+            {
+                EvalCommand lstatement = parseEvalExpression(ParenExpression);
+                EvalCommand rstatement = builFindCommand(cmd.substr(nextOpIndex + 1, nextNextOpIndex - nextOpIndex - 1));
+                prependEval.addCommand(OperationCommand(lstatement, rstatement, op));
+            }
+            selectedOp = cmd.substr(nextNextOpIndex, 1);
+            i = matchingClosingBracket;
             continue;
         }
         bool isFound;
-        int nextOpIndex = find_next_op_index(cmd.substr(i), isFound) + i;
+        int nextOpIndex = find_next_op_index(s, cmd.substr(i), isFound) + i;
         if (!isFound) // case: all of cmd is a terminal name
         {
             eval.addCommand(builFindCommand(cmd.substr(i)));
@@ -268,30 +343,47 @@ EvalCommand Parser::parseEvalExpression(std::string cmd)
         {
             throw Exception("Bad Syntax. Missing value for operation");
         }
-        if (cmd[i + 1] == '(') //case: open parentheses
-        {
-            int closeIndex = 9;                                                                                          //find close...
-            eval.addCommand(OperationCommand(lstatement, parseEvalExpression(remainder.substr(1, closeIndex - 1)), op)); // () block!!
-            i = closeIndex;
-            continue;
-        }
+        int nextNextOpIndex;
         bool isFoundNext;
-        int nextNextOpIndex = find_next_op_index(remainder, isFoundNext) + i + 2;
+        int remainderFirstCharIndex = remainder.find_first_not_of(" ") + nextOpIndex + 1;
+        if (cmd[remainderFirstCharIndex] == '(')
+        {
+            int remainderMatchingParenIndex = findClosingParen(cmd, remainderFirstCharIndex);
+            std::string remainderAfterSecondParen = cmd.substr(remainderMatchingParenIndex + 1);
+            nextNextOpIndex = find_next_op_index(s, remainderAfterSecondParen, isFoundNext) + i + remainderMatchingParenIndex + 1;
+        }
+        else
+        {
+            nextNextOpIndex = find_next_op_index(s, remainder, isFoundNext) + i + nextOpIndex + 1;
+        }
         if (!isFoundNext) //case: this is the last op in cmd
         {
-            EvalCommand rstatement = builFindCommand(remainder);
+            EvalCommand rstatement = parseEvalExpression(remainder);
             eval.addCommand(OperationCommand(lstatement, rstatement, op));
             break;
         }
-        EvalCommand rstatement = builFindCommand(cmd.substr(nextOpIndex + 1, nextNextOpIndex - nextOpIndex - 1));
-        prependEval.addCommand(OperationCommand(lstatement, rstatement, op));
+        if (cmd[remainderFirstCharIndex] == '(')
+        {
+            int remainderMatchingParenIndex = findClosingParen(cmd, remainderFirstCharIndex);
+            std::string terminal2 = cmd.substr(remainderFirstCharIndex + 1, remainderMatchingParenIndex - remainderFirstCharIndex - 1);
+            std::string gapToNextOp = cmd.substr(remainderMatchingParenIndex + 1, nextNextOpIndex - remainderMatchingParenIndex - 1);
+            if (trim(gapToNextOp, " ") != "")
+            {
+                throw Exception("Couldn't parse.");
+            }
+            EvalCommand rstatement = parseEvalExpression(terminal);
+            prependEval.addCommand(OperationCommand(lstatement, rstatement, op));
+        }
+        else
+        {
+            std::string terminal2 = cmd.substr(nextOpIndex + 1, nextNextOpIndex - nextOpIndex - 1);
+            EvalCommand rstatement = builFindCommand(terminal2);
+            prependEval.addCommand(OperationCommand(lstatement, rstatement, op));
+        }
         selectedOp = cmd.substr(nextNextOpIndex, 1);
         i = nextNextOpIndex;
     }
-    if (parenthesesCounter != 0)
-    {
-        throw Exception("Bad Syntax. Unbalanced parentheses");
-    }
+
     return eval;
 }
 
@@ -302,7 +394,7 @@ PrintCommand Parser::parsePrintCommand(std::string cmd)
         int openPIndex = cmd.find_first_not_of(" ", cmd.find("print") + 5);
         if (cmd[openPIndex] == '(' && cmd[cmd.find_first_not_of(" ", openPIndex + 1)] != ')')
         {
-            int matchingClosingBracket = cmd.find(")", openPIndex); //TODO!!!!
+            int matchingClosingBracket = findClosingParen(cmd, openPIndex);
             std::string printCommandParam = cmd.substr(openPIndex + 1, matchingClosingBracket - openPIndex - 1);
             if (trim(printCommandParam, " ") == "")
             {
@@ -340,29 +432,16 @@ SaveCommand Parser::parseSaveCommand(std::string cmd)
         int openPIndex = cmd.find_first_not_of(" ", cmd.find("save") + 4);
         if (cmd[openPIndex] == '(' && cmd[cmd.find_first_not_of(" ", openPIndex + 1)] != ')')
         {
-            if (cmd[cmd.find_first_not_of(" ", openPIndex + 1)] == '{')
+            if (cmd.find_last_of(',') != string::npos)
             {
-                if (cmd.find('}', cmd.find_first_not_of(" ", openPIndex + 1) != string::npos))
-                {
-                    int comma = cmd.find(',', cmd.find('}', cmd.find_first_not_of(" ", openPIndex + 1)));
-                    std::string e = cmd.substr(openPIndex + 1, openPIndex - comma - 1);
-
-                    EvalCommand evalExpression = parseEvalExpression(e);
-                    std::string filename = cmd.substr(comma + 1, cmd.find(")", comma) - comma - 1);
-                    if (is_not_reserved_word(filename) && filename.find(',') == string::npos)
-                    {
-                        return SaveCommand(parseTerminalName(filename), evalExpression);
-                    }
-                }
-            }
-            else if (cmd.find(',', openPIndex) != string::npos)
-            {
-                std::string e = cmd.substr(openPIndex + 1, cmd.find(',', openPIndex) - openPIndex - 1);
+                int comma = cmd.find_last_of(',');
+                std::string e = cmd.substr(openPIndex + 1, comma - openPIndex - 1);
                 EvalCommand evalExpression = parseEvalExpression(e);
-                std::string filename = cmd.substr(cmd.find(",", openPIndex) + 1, cmd.find(")", cmd.find(",", openPIndex)) - cmd.find(",", openPIndex) - 1);
-                if (is_not_reserved_word(filename) && filename.find(',') == string::npos)
+                std::string filename = cmd.substr(comma + 1, cmd.find(")", comma) - comma - 1);
+                std::string remainder = cmd.substr(cmd.find(")", comma) + 1);
+                if (is_not_reserved_word(filename) && filename.find(',') == string::npos && trim(remainder, " ") == "")
                 {
-                    return SaveCommand(parseTerminalName(filename), evalExpression);
+                    return SaveCommand(parseFileName(filename), evalExpression);
                 }
             }
         }
@@ -373,9 +452,9 @@ SaveCommand Parser::parseSaveCommand(std::string cmd)
 
 void Parser::command(std::string cmd, std::map<std::string, shared_ptr<Graph>> &context, IContextParams params)
 {
-    if (cmd.find("()") != string::npos)
+    if (cmd.find("()") != string::npos || !areParanthesisBalanced(strip_to_parantheiss_only(cmd, '(', ')')))
     {
-        throw Exception("Bad Syntax.");
+        throw Exception("Bad Syntax. Empty or Unbalanced Paranthesis");
     }
     else if (cmd.find('=') != string::npos)
     {
@@ -404,6 +483,10 @@ void Parser::command(std::string cmd, std::map<std::string, shared_ptr<Graph>> &
     else if (trim(cmd, " ") == "reset")
     {
         ResetCommand().exec(context, params);
+    }
+    else if (trim(cmd, " ") == "")
+    {
+        return;
     }
     else
     {
