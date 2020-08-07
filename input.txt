@@ -1,7 +1,2 @@
-b = {a,b| <a,b>}
-a = {[;],[]}
-c =a+b
-d = c*d
-save(b, test)
-a = load(test)
-print(a)
+save({a} +{g}-{a},te  st.gc)
+print(load(te  st.gc))

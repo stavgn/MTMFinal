@@ -5,6 +5,7 @@
 #include <set>
 #include <memory>
 #include <string>
+#include <type_traits>
 #include "./Vertex.h"
 
 using std::shared_ptr;
