@@ -103,3 +103,12 @@ std::string gcalc::strip_to_parantheiss_only(std::string expr, char open, char c
     }
     return out;
 }
+
+std::string gcalc::char_to_string(char c)
+{
+    char temp[2];
+    temp[0] = c;
+    temp[1] = '\0';
+    std::string s = temp;
+    return s;
+}

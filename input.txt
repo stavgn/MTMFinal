@@ -1,7 +1,6 @@
 b = {a,b| <a,b>}
 a = {[;],[]}
-c =a+b
-d = c*d
-save(b, test)
-a = load(test)
-print(a)
+c = {a,b| <a,b>} + {[;],;[]}
+save(a+b, test2)
+t = load(test2)
+print   (c)   

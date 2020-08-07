@@ -13,6 +13,7 @@ namespace gcalc
     bool is_alphanumeric(std::string word);
     std::string strip_to_parantheiss_only(std::string expr, char open, char close);
     bool areParanthesisBalanced(std::string expr);
+    std::string char_to_string(char c);
 } // namespace gcalc
 
 #endif

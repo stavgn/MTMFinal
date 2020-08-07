@@ -24,10 +24,16 @@ namespace gcalc
     private:
         std::string parseTerminalName(std::string cmd);
         EvalCommand parseEvalExpression(std::string cmd);
+        EvalCommand parseEvalExpression2(std::string cmd);
         PrintCommand parsePrintCommand(std::string cmd);
         SaveCommand parseSaveCommand(std::string cmd);
-        bool isConatainingReservedChars(std::string cmd);
+        bool is_valid_cmd_opener(std::string cmd, bool with_literal);
         DeleteCommand parseDeleteCommand(std::string cmd);
+        EvalCommand builFindCommand(std::string terminal);
+        LoadCommand handleLoadCommand(std::string cmd);
+        OperationCommand handleComplementCommand(std::string cmd);
+        EvalCommand handleGraphLiteralCommand(std::string cmd);
+        int find_next_op_index(std::string cmd, bool &isFound);
     };
 
 } // namespace gcalc

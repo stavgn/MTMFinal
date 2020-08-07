@@ -67,14 +67,16 @@ namespace gcalc
         void exec(std::map<std::string, shared_ptr<Graph>> &context, IContextParams &params) override;
     };
 
+    class EvalCommand;
+
     class OperationCommand : public Command
     {
-        std::string g1;
-        std::string g2;
+        shared_ptr<EvalCommand> exp1;
+        shared_ptr<EvalCommand> exp2;
         std::string op;
 
     public:
-        OperationCommand(std::string g1, std::string g2, std::string op);
+        OperationCommand(EvalCommand ex1, EvalCommand ex2, std::string op);
         ~OperationCommand() = default;
         void exec(std::map<std::string, shared_ptr<Graph>> &context, IContextParams &params) override;
     };
@@ -92,15 +94,16 @@ namespace gcalc
     class EvalCommand : public Command
     {
     public:
-        std::vector<CreateAndAssignVertexCommand> VertexCommands;
-        std::vector<CreateAndAssignEdgeCommand> EdgeCommands;
-        std::vector<FindGraphCommand> FindCommands;
-        std::vector<EvalCommand> SubEvalCommands;
-        std::vector<OperationCommand> OperationCommands;
-        std::vector<LoadCommand> LoadCommands;
+        std::vector<shared_ptr<CreateAndAssignVertexCommand>> VertexCommands;
+        std::vector<shared_ptr<CreateAndAssignEdgeCommand>> EdgeCommands;
+        std::vector<shared_ptr<FindGraphCommand>> FindCommands;
+        std::vector<shared_ptr<EvalCommand>> SubEvalCommands;
+        std::vector<shared_ptr<OperationCommand>> OperationCommands;
+        std::vector<shared_ptr<LoadCommand>> LoadCommands;
 
         EvalCommand();
         ~EvalCommand() = default;
+        //EvalCommand(EvalCommand &e) = default;
         void addCommand(CreateAndAssignVertexCommand command);
         void addCommand(CreateAndAssignEdgeCommand command);
         void addCommand(FindGraphCommand command);
