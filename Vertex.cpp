@@ -38,7 +38,7 @@ bool Vertex::is_name_valid(std::string name)
 {
     for (unsigned int i = 0; i < name.size(); i++)
     {
-        if (!isalpha(name[i]) && name[i] != '[' && name[i] != ']' && name[i] != ';')
+        if (!isalnum(name[i]) && name[i] != '[' && name[i] != ']' && name[i] != ';')
         {
             return false;
         }
