@@ -58,6 +58,10 @@ void Calculator::batch(std::string input, std::string output)
         {
             try
             {
+                if (cmd.find("\r") != string::npos && cmd.find("\r") == cmd.size() - 1)
+                {
+                    cmd = cmd.substr(0, cmd.find("\r"));
+                }
                 if (parse.trim(cmd, " ") == "quit")
                 {
                     in.close();
