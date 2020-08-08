@@ -5,7 +5,6 @@
 #include <set>
 #include <memory>
 #include <string>
-#include <type_traits>
 #include "./Vertex.h"
 
 using std::shared_ptr;
@@ -19,6 +18,7 @@ namespace gcalc
         std::string name;
         shared_ptr<std::set<shared_ptr<Vertex>>> vertices;
         shared_ptr<std::set<std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>>>> edges;
+        Graph() = default;
         Graph(std::string graphName);
         ~Graph() = default;
         Graph(const Graph &g);
@@ -30,6 +30,8 @@ namespace gcalc
         Graph operator!();
         void add_vertex(shared_ptr<Vertex> v);
         void add_edge(shared_ptr<Vertex> v1, shared_ptr<Vertex> v2);
+        void add_vertex(Vertex v);
+        void add_edge(Vertex v1, Vertex v2);
         void add_edge(std::pair<shared_ptr<Vertex>, shared_ptr<Vertex>> edge);
         shared_ptr<Vertex> find_vertex(std::string vertexName);
         std::string get_name() const;

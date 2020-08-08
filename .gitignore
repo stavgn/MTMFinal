@@ -4,3 +4,9 @@ gcalc
 test
 
 export LD_LIBRARY_PATH="/usr/local/lib64:${LD_LIBRARY_PATH}"
+
+swig -python -o graph_wrap.c graph.i
+
+g++ -std=c++11 -DNDEBUG --pedantic-errors -Wall -Werror -I/usr/local/include/python3.6m -fPIC -shared graph_wrap.c libgraph.a -o _graph.so
+
+ld -shared _graph.o  -L/usr/local/include/python3.6m/ -o _graph.so

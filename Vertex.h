@@ -4,7 +4,6 @@
 
 #include <set>
 #include <memory>
-#include <string>
 
 namespace gcalc
 {
@@ -15,6 +14,7 @@ namespace gcalc
     public:
         Vertex(std::string vertexName);
         ~Vertex() = default;
+        Vertex(Vertex &v) = default;
         std::string get_name() const;
         bool operator==(Vertex v) const;
         bool operator!=(Vertex v) const;
