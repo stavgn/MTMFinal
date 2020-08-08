@@ -1,6 +1,7 @@
 #include "./Calculator.h"
 #include "./Exception.h"
 #include <iostream>
+
 using namespace gcalc;
 
 int main(int argc, char **argv)
