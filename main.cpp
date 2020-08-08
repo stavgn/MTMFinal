@@ -10,7 +10,7 @@ int main(int argc, char **argv)
     {
         calc.interactive();
     }
-    if (argc == 3)
+    else if (argc == 3)
     {
         calc.batch(argv[1], argv[2]);
     }
