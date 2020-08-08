@@ -4,7 +4,6 @@
 
 #include <set>
 #include <memory>
-#include <string>
 
 namespace gcalc
 {

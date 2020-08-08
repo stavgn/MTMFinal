@@ -4,3 +4,29 @@ gcalc
 test
 
 export LD_LIBRARY_PATH="/usr/local/lib64:${LD_LIBRARY_PATH}"
+
+swig -python -c++ graph.i 
+
+g++ -std=c++11 -DNDEBUG --pedantic-errors -Wall -Werror -I/usr/local/include/python3.6m -fPIC -shared graph_wrap.cxx libgraph.a -o _graph.so  -static-libstdc++
+
+ld -shared _graph.o  -L/usr/local/include/python3.6m/ -o _graph.so
+
+g++ -shared -o graphwrap.a -static-libstdc++
+g++ -shared -o libgraph.a -static-libstdc++
+g++ -shared -o libgraph.a Vertex.o Graph.o libgraph.o -static-libstdc++
+
+g++ -std=c++11 -c  --pedantic-errors -Wall -Werror -fPIC -I/usr/local/include/python3.6m graph_wrap.cxx 
+
+g++ -shared -L. -lfoo -lpython2.6 -Wl,-soname,_foo.so foo_wrap.o -o _foo.so
+
+ld -shared _graph.o  -L/usr/local/include/python3.6m/ -o _graph.so
+
+swig -c++ -python graph.i && g++ -std=c++11 -pedantic-errors -Wall -Werror graph_wrap.cxx libgraph.a -I/usr/local/include/python3.6m  -fPIC -shared -o _graph.so
+
+
+
+GraphPtr graphUnion(GraphPtr graph_in1, GraphPtr graph_in2, GraphPtr graph_out);
+GraphPtr graphIntersection(GraphPtr graph_in1, GraphPtr graph_in2, GraphPtr graph_out);
+GraphPtr graphDifference(GraphPtr graph_in1, GraphPtr graph_in2, GraphPtr graph_out);
+GraphPtr graphProduct(GraphPtr graph_in1, GraphPtr graph_in2, GraphPtr graph_out);
+GraphPtr graphComplement(GraphPtr graph_in, GraphPtr graph_out);

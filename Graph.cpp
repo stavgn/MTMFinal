@@ -302,3 +302,16 @@ Graph Graph::operator!()
     edges = edgesComp;
     return *this;
 }
+
+void Graph::add_vertex(Vertex v)
+{
+    std::shared_ptr<Vertex> shared = std::shared_ptr<Vertex>(new Vertex(v.get_name()));
+    add_vertex(shared);
+}
+void Graph::add_edge(Vertex v1, Vertex v2)
+{
+    std::shared_ptr<Vertex> shared1 = std::shared_ptr<Vertex>(new Vertex(v1.get_name()));
+    std::shared_ptr<Vertex> shared2 = std::shared_ptr<Vertex>(new Vertex(v2.get_name()));
+
+    add_edge(shared1, shared2);
+}
