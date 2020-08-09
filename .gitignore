@@ -2,7 +2,6 @@
 *.o
 gcalc
 test
-*.zip
 
 export LD_LIBRARY_PATH="/usr/local/lib64:${LD_LIBRARY_PATH}"
 
@@ -32,4 +31,4 @@ GraphPtr graphDifference(GraphPtr graph_in1, GraphPtr graph_in2, GraphPtr graph_
 GraphPtr graphProduct(GraphPtr graph_in1, GraphPtr graph_in2, GraphPtr graph_out);
 GraphPtr graphComplement(GraphPtr graph_in, GraphPtr graph_out);
 
- ~/../mtm/public/1920b/project/Tests/4.4/test1.py
+ ~/../mtm/public/1920b/project/finalCheck
