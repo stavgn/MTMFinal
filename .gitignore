@@ -32,3 +32,5 @@ GraphPtr graphProduct(GraphPtr graph_in1, GraphPtr graph_in2, GraphPtr graph_out
 GraphPtr graphComplement(GraphPtr graph_in, GraphPtr graph_out);
 
  ~/../mtm/public/1920b/project/finalCheck
+
+ is_not_reserved_word(filename) && 

@@ -56,6 +56,11 @@ int Parser::find_next_op_index(std::string current, std::string cmd, bool &isFou
     {
         i = 1 + findClosingParen(cmd, 1);
     }
+    else if (cmd.substr(0, 5) == "load " || cmd.substr(0, 5) == "load(")
+    {
+        int open = cmd.find_first_of('(');
+        i = 1 + findClosingParen(cmd, open);
+    }
     else
     {
         i = 0;
@@ -103,7 +108,7 @@ EvalCommand Parser::builFindCommand(std::string terminal)
 {
     terminal = trim(terminal, " ");
     EvalCommand eval = EvalCommand();
-    if (terminal.substr(0, 4) == "load")
+    if (terminal.substr(0, 5) == "load " || terminal.substr(0, 5) == "load(")
     {
         LoadCommand load = handleLoadCommand(terminal);
         eval.addCommand(load);
@@ -227,6 +232,11 @@ EvalCommand Parser::parseEvalExpression(std::string cmd)
         if (!is_valid_cmd_opener(s, true))
         {
             throw Exception("Bad Syntax. operations abuse.");
+        }
+
+        if (s == " ")
+        {
+            continue;
         }
 
         if (selectedOp != "")
@@ -371,7 +381,7 @@ EvalCommand Parser::parseEvalExpression(std::string cmd)
             {
                 throw Exception("Couldn't parse.");
             }
-            EvalCommand rstatement = parseEvalExpression(terminal);
+            EvalCommand rstatement = parseEvalExpression(terminal2);
             prependEval.addCommand(OperationCommand(lstatement, rstatement, op));
         }
         else
@@ -439,7 +449,7 @@ SaveCommand Parser::parseSaveCommand(std::string cmd)
                 EvalCommand evalExpression = parseEvalExpression(e);
                 std::string filename = cmd.substr(comma + 1, cmd.find(")", comma) - comma - 1);
                 std::string remainder = cmd.substr(cmd.find(")", comma) + 1);
-                if (is_not_reserved_word(filename) && filename.find(',') == string::npos && trim(remainder, " ") == "")
+                if (filename.find(',') == string::npos && trim(remainder, " ") == "")
                 {
                     return SaveCommand(parseFileName(filename), evalExpression);
                 }

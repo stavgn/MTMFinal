@@ -11,7 +11,7 @@ bool gcalc::is_not_reserved_word(std::string word)
     for (int i = 0; i < 8; i++)
     {
 
-        if (std::regex_match(word, std::regex(chars[i])))
+        if (word == chars[i])
         {
             return false;
         }
