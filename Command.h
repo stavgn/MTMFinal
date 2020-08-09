@@ -103,7 +103,6 @@ namespace gcalc
 
         EvalCommand();
         ~EvalCommand() = default;
-        //EvalCommand(EvalCommand &e) = default;
         void addCommand(CreateAndAssignVertexCommand command);
         void addCommand(CreateAndAssignEdgeCommand command);
         void addCommand(FindGraphCommand command);

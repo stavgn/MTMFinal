@@ -1,2 +1,44 @@
-a = {[;]}
-a = {[[;]][;;;;;;[;]];[]}
+a = {}
+a = {a}
+b = {|}
+a = {} tt
+print(a)
+c = {[];[], a,b | <a,b>}
+d = {a | <a,a>}
+d = {a | <    a, b   > }   
+a = d+c+e
+who
+e = d*e
+save(e, graph.gc)
+delete(   e   )   
+who
+e = load(graph.gc) +a+b-d
+print(e)
+print(e*{})
+f = ((((load(graph.gc))))) *(e)
+print(e)
+reset 
+    who
+who a
+asdfg
+a = load(nograph.gc)
+print(a)
+a = {a,b,c, [];}
+1a = {a,b,c}
+who
+a = {a,b,c, $}
+a = {a,b,c, [;]| <a,b>, <b,a>}
+b = {b,c} * 
+c = !({v,f,g,r|   <v,g>, <r,g>, <v,f>} * (a+b^a) - {a})
+print(c)
+print(g)
+save(!({v,f,g,r|   <v,g>, <r,g>, <v,f>} * (a+b^a) - {a}), graph2.gc)
+print(!!load(graph2.gc))
+g = !!c
+who
+delete(     g  )
+g = { [;]  ,[;]}
+g = {
+print({v,f,g,r|   <v,g>, <r,g>, <v,f>})
+   print(!{v,f,g,r|   <v,g>, <r,g>, <v,f>})    
+   quit   

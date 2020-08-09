@@ -153,7 +153,7 @@ EvalCommand Parser::handleGraphLiteralCommand(std::string cmd)
     if (cmd.find("{") != string::npos && cmd.find("}") != string::npos && cmd.find("{") < cmd.find("}"))
     {
         std::string graph_literal = cmd.substr(cmd.find("{") + 1, cmd.find("}") - cmd.find("{") - 1);
-        if (trim(graph_literal, " ") == "")
+        if (trim(graph_literal, " ") == "" || trim(graph_literal, " ") == "|")
         {
             return eval;
         }
