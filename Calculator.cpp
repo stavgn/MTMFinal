@@ -17,9 +17,9 @@ void Calculator::interactive()
 {
     Parser parse = Parser();
     std::string cmd;
-    while (true)
+    while (!cin.eof())
     {
-        std::cout << "Gcalc>";
+        std::cout << "Gcalc> ";
         std::getline(std::cin, cmd);
         try
         {
