@@ -29,16 +29,22 @@ who
 a = {a,b,c, $}
 a = {a,b,c, [;]| <a,b>, <b,a>}
 b = {b,c} * 
-c = !({v,f,g,r|   <v,g>, <r,g>, <v,f>} * (a+b^a) - {a})
+c = !({v,f,g,r|   <v,g>, <r,g>, <v,f>} * (a+{}^a) - {a})
 print(c)
 print(g)
-save(!({v,f,g,r|   <v,g>, <r,g>, <v,f>} * (a+b^a) - {a}), graph2.gc)
+save(!({v,f,g,r|   <v,g>, <r,g>, <v,f>} * (a+{}^a) - {a}), graph2.gc)
 print(!!load(graph2.gc))
 g = !!c
 who
 delete(     g  )
 g = { [;]  ,[;]}
 g = {
+    loadload = {a,b,c}
+print(loadload)  
+save(loadload, but+why.gc) 
+save(loadload, loadload) 
+print(load(but+why.gc))
+print(load(loadload))
 print({v,f,g,r|   <v,g>, <r,g>, <v,f>})
    print(!{v,f,g,r|   <v,g>, <r,g>, <v,f>})    
    quit   
