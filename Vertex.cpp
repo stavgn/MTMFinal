@@ -55,8 +55,16 @@ bool Vertex::is_name_valid(std::string name)
         {
             return false;
         }
+        std::string clone = name;
+        int p = clone.find_first_of('[');
+        while (clone.find_first_of('[') != string::npos)
+        {
+            int close = findClosingBracket(clone, p);
+            clone = clone.replace(p, close - p + 1, "");
+            p = clone.find_first_of('[');
+        }
 
-        return (name.find_first_of(';') >= name.find_first_of('[')) && (name.find_last_of(';') <= name.find_last_of(']'));
+        return clone.find(';') == string::npos;
     }
 
     return true;

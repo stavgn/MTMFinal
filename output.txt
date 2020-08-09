@@ -1,2 +1,1 @@
-g
-$
+Error: Vertex name is not valid: [[;]][;;;;;;[;]];[]

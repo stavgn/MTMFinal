@@ -21,7 +21,7 @@ g++ -shared -L. -lfoo -lpython2.6 -Wl,-soname,_foo.so foo_wrap.o -o _foo.so
 
 ld -shared _graph.o  -L/usr/local/include/python3.6m/ -o _graph.so
 
-swig -c++ -python graph.i && g++ -std=c++11 -pedantic-errors -Wall -Werror graph_wrap.cxx libgraph.a -I/usr/local/include/python3.6m  -fPIC -shared -o _graph.so
+swig -python graph.i && g++ -std=c++11 -pedantic-errors -Wall -Werror graph_wrap.c libgraph.a -I/usr/local/include/python3.6m  -fPIC -shared -o _graph.so  -static-libstdc++
 
 
 
@@ -30,3 +30,5 @@ GraphPtr graphIntersection(GraphPtr graph_in1, GraphPtr graph_in2, GraphPtr grap
 GraphPtr graphDifference(GraphPtr graph_in1, GraphPtr graph_in2, GraphPtr graph_out);
 GraphPtr graphProduct(GraphPtr graph_in1, GraphPtr graph_in2, GraphPtr graph_out);
 GraphPtr graphComplement(GraphPtr graph_in, GraphPtr graph_out);
+
+ ~/../mtm/public/1920b/project/Tests/4.4/test1.py

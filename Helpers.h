@@ -15,6 +15,7 @@ namespace gcalc
     bool areParanthesisBalanced(std::string expr);
     std::string char_to_string(char c);
     int findClosingParen(std::string text, int openPos);
+    int findClosingBracket(std::string text, int openPos);
 
 } // namespace gcalc
 
