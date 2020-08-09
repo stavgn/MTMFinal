@@ -30,6 +30,8 @@ libgraph.a: $(OBJS)
 	ar -rs $@ $^	
 clean:
 	rm -f $(OBJS) ${EXEC} libgraph.a
+tar:
+	zip gcalc Calculator.cpp Calculator.h Command.cpp Command.h Exception.cpp Exception.h graph.i _graph.so Graph.cpp Graph.h Helpers.cpp Helpers.h libgraph.cpp libgraph.h main.cpp Makefile Parser.cpp Parser.h Vertex.cpp Vertex.h test_in.txt test_out.txt design.pdf	
 
 
 
