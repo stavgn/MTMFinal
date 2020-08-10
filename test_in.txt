@@ -2,6 +2,7 @@ a = {}
 a = {a}
 b = {|}
 a = {} tt
+a = {}
 print(a)
 c = {[];[], a,b | <a,b>}
 d = {a | <a,a>}
@@ -47,4 +48,4 @@ print(load(but+why.gc))
 print(load(loadload))
 print({v,f,g,r|   <v,g>, <r,g>, <v,f>})
    print(!{v,f,g,r|   <v,g>, <r,g>, <v,f>})    
-   quit   
+   quit     

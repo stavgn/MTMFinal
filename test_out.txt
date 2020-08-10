@@ -1,3 +1,4 @@
+Error: Bad Syntax. Invalid Graph Literal definition.
 $
 Error: Vertex name is not valid: [];[]
 Error: Cannot create a Self-Edge toa

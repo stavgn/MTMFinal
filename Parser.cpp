@@ -157,15 +157,16 @@ EvalCommand Parser::handleGraphLiteralCommand(std::string cmd)
     EvalCommand eval = EvalCommand();
     if (cmd.find("{") != string::npos && cmd.find("}") != string::npos && cmd.find("{") < cmd.find("}"))
     {
-        std::string graph_literal = cmd.substr(cmd.find("{") + 1, cmd.find("}") - cmd.find("{") - 1);
-        if (trim(graph_literal, " ") == "" || trim(graph_literal, " ") == "|")
-        {
-            return eval;
-        }
         std::string remainder = cmd.substr(cmd.find("}") + 1);
         if (trim(remainder, " ") != "")
         {
             throw Exception("Bad Syntax. Invalid Graph Literal definition.");
+        }
+
+        std::string graph_literal = cmd.substr(cmd.find("{") + 1, cmd.find("}") - cmd.find("{") - 1);
+        if (trim(graph_literal, " ") == "" || trim(graph_literal, " ") == "|")
+        {
+            return eval;
         }
 
         std::string vertices = cmd.substr(cmd.find("{") + 1, (cmd.find("|") == string::npos ? cmd.find("}") : cmd.find("|")) - cmd.find("{") - 1);
