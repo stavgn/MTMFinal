@@ -23,6 +23,11 @@ gcalc::Graph *create()
 
 void destroy(gcalc::Graph *g)
 {
+    if (g == nullptr)
+    {
+        std::cout << "Error: argument is nullptr" << std::endl;
+        return;
+    }
     try
     {
         delete g;
@@ -39,6 +44,11 @@ void destroy(gcalc::Graph *g)
 
 gcalc::Graph *addVertex(gcalc::Graph *g, char *v)
 {
+    if (g == nullptr)
+    {
+        std::cout << "Error: argument is nullptr" << std::endl;
+        return nullptr;
+    }
     try
     {
         gcalc::Vertex ver(v);
@@ -58,6 +68,11 @@ gcalc::Graph *addVertex(gcalc::Graph *g, char *v)
 
 gcalc::Graph *addEdge(gcalc::Graph *g, char *v1, char *v2)
 {
+    if (g == nullptr)
+    {
+        std::cout << "Error: argument is nullptr" << std::endl;
+        return nullptr;
+    }
     try
     {
         gcalc::Vertex ver1(v1);
@@ -78,6 +93,11 @@ gcalc::Graph *addEdge(gcalc::Graph *g, char *v1, char *v2)
 
 void disp(gcalc::Graph *g)
 {
+    if (g == nullptr)
+    {
+        std::cout << "Error: argument is nullptr" << std::endl;
+        return;
+    }
     try
     {
         g->print();
@@ -94,6 +114,11 @@ void disp(gcalc::Graph *g)
 
 gcalc::Graph *graphUnion(gcalc::Graph *graph_in1, gcalc::Graph *graph_in2, gcalc::Graph *graph_out)
 {
+    if (graph_in1 == nullptr || graph_in2 == nullptr || graph_out == nullptr)
+    {
+        std::cout << "Error: argument is nullptr" << std::endl;
+        return nullptr;
+    }
     try
     {
         *graph_out = *graph_in1 + *graph_in2;
@@ -112,6 +137,11 @@ gcalc::Graph *graphUnion(gcalc::Graph *graph_in1, gcalc::Graph *graph_in2, gcalc
 
 gcalc::Graph *graphIntersection(gcalc::Graph *graph_in1, gcalc::Graph *graph_in2, gcalc::Graph *graph_out)
 {
+    if (graph_in1 == nullptr || graph_in2 == nullptr || graph_out == nullptr)
+    {
+        std::cout << "Error: argument is nullptr" << std::endl;
+        return nullptr;
+    }
     try
     {
         *graph_out = *graph_in1 ^ *graph_in2;
@@ -130,6 +160,11 @@ gcalc::Graph *graphIntersection(gcalc::Graph *graph_in1, gcalc::Graph *graph_in2
 
 gcalc::Graph *graphDifference(gcalc::Graph *graph_in1, gcalc::Graph *graph_in2, gcalc::Graph *graph_out)
 {
+    if (graph_in1 == nullptr || graph_in2 == nullptr || graph_out == nullptr)
+    {
+        std::cout << "Error: argument is nullptr" << std::endl;
+        return nullptr;
+    }
     try
     {
         *graph_out = *graph_in1 - *graph_in2;
@@ -148,6 +183,11 @@ gcalc::Graph *graphDifference(gcalc::Graph *graph_in1, gcalc::Graph *graph_in2, 
 
 gcalc::Graph *graphProduct(gcalc::Graph *graph_in1, gcalc::Graph *graph_in2, gcalc::Graph *graph_out)
 {
+    if (graph_in1 == nullptr || graph_in2 == nullptr || graph_out == nullptr)
+    {
+        std::cout << "Error: argument is nullptr" << std::endl;
+        return nullptr;
+    }
     try
     {
         *graph_out = *graph_in1 * *graph_in2;
@@ -166,6 +206,11 @@ gcalc::Graph *graphProduct(gcalc::Graph *graph_in1, gcalc::Graph *graph_in2, gca
 
 gcalc::Graph *graphComplement(gcalc::Graph *graph_in, gcalc::Graph *graph_out)
 {
+    if (graph_in == nullptr || graph_out == nullptr)
+    {
+        std::cout << "Error: argument is nullptr" << std::endl;
+        return nullptr;
+    }
     try
     {
         *graph_out = !(*graph_in);
