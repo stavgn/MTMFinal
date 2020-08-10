@@ -530,7 +530,6 @@ $
 a
 c
 g
-Error: Couldn't Find Graph To Delete.
 Error: Cannot Duplicate Vertex [;]
 Error: Bad Syntax. Invalid Graph literal definition.
 a

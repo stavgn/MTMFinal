@@ -430,7 +430,7 @@ DeleteCommand Parser::parseDeleteCommand(std::string cmd)
             {
                 throw Exception("Bad Syntax. print function. No valid graph found");
             }
-            return DeleteCommand(deleteCommandParam);
+            return DeleteCommand(trim(deleteCommandParam, " "));
         }
     }
     throw Exception("Bad Syntax. print function");
