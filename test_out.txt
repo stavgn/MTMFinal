@@ -566,3 +566,5 @@ g v
 r f
 r v
 v r
+Error: Bad Eval Expression.
+Error: Bad Syntax. Invalid Graph Literal definition.

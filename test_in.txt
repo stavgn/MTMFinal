@@ -47,5 +47,7 @@ save(loadload, loadload)
 print(load(but+why.gc))
 print(load(loadload))
 print({v,f,g,r|   <v,g>, <r,g>, <v,f>})
-   print(!{v,f,g,r|   <v,g>, <r,g>, <v,f>})    
+   print(!{v,f,g,r|   <v,g>, <r,g>, <v,f>})
+  inv =  ({you}) {wait}
+  save({}), (yesyou )       
    quit     

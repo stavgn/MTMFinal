@@ -298,6 +298,11 @@ EvalCommand Parser::parseEvalExpression(std::string cmd)
             int nextOpIndex = find_next_op_index(s, cmd.substr(matchingClosingBracket), isFound) + i + matchingClosingBracket;
             if (!isFound)
             {
+                std::string remainder = cmd.substr(matchingClosingBracket + 1);
+                if (trim(remainder, " ") != "")
+                {
+                    throw Exception("Bad Eval Expression.");
+                }
                 eval.addCommand(parseEvalExpression(ParenExpression));
                 break;
             }
